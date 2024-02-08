@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">CongLyStore</string>
+    <string name="web_client_id">1004882772582-49mej4ef0snj60v8k46fk4nu15hjtljr.apps.googleusercontent.com</string>
+    <string name="login_now">Đăng nhập ngay</string>
+    <string name="logout">Đăng xuất</string>
+
+
+    <string name="facebook_application_id" translatable="false">421993006849134</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb421993006849134</string>
+    <string name="facebook_client_token" translatable="false">421993006849134|2NPuLRlul6YuldEW0oEQhLJfIo4</string>
+
+
+    <string name="route_home">home</string>
+    <string name="route_auth">auth</string>
+    <string name="route_splash">splash</string>
+    <string name="route_settings">settings</string>
+    <string name="route_update_user">update_user</string>
+
+
+</resources>

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1004882772582",
+    "project_id": "conglystore",
+    "storage_bucket": "conglystore.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004882772582:android:0699d3425dd4e9c87ce3a7",
+        "android_client_info": {
+          "package_name": "com.mgok.conglystore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004882772582-slul9kovbiptbkl0mjtrqr6i359i9n9d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mgok.conglystore",
+            "certificate_hash": "e8fa89494bf0dfd91f5256ea706dd6eec5d72d74"
+          }
+        },
+        {
+          "client_id": "1004882772582-49mej4ef0snj60v8k46fk4nu15hjtljr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-5pBIiHTh_zktFXyKadDEc4g1s3Kr9PM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004882772582-49mej4ef0snj60v8k46fk4nu15hjtljr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
