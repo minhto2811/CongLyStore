@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,16 +31,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyTextField
-import com.mgok.conglystore.utils.isValidEmail
+import com.mgok.conglystore.presentation.auth.ResultStatusState
+import com.mgok.conglystore.utilities.NoRippleInteractionSource
+import com.mgok.conglystore.utilities.isValidEmail
 
 @Composable
 fun ResetPassword(
     visible: MutableState<Boolean>,
-    resetPasswordViewModel: ResetPasswordViewModel,
-    visibleLoading: MutableState<Boolean>
+    resetPasswordViewModel: ResetPasswordViewModel = hiltViewModel(),
+    visibleLoading: MutableState<Boolean>,
+    timeCountdown: MutableState<Int>
 ) {
     if (visible.value) {
         Dialog(
@@ -52,36 +57,44 @@ fun ResetPassword(
             val context = LocalContext.current
             rememberCoroutineScope()
 
-            val state = resetPasswordViewModel.state.collectAsStateWithLifecycle()
+            val state by resetPasswordViewModel.state.collectAsStateWithLifecycle()
 
             val email = remember {
                 mutableStateOf("")
             }
 
 
+            LaunchedEffect(key1 = state.status) {
+                when (state.status) {
+                    ResultStatusState.Loading -> {
+                        visibleLoading.value = true
+                    }
 
-
-            LaunchedEffect(key1 = state.value.isSuccessful) {
-                if (state.value.isSuccessful) {
-                    email.value = ""
-                    visibleLoading.value = false
-                    resetPasswordViewModel.resetState()
-                }
-            }
-
-            LaunchedEffect(key1 = state.value.message) {
-                state.value.message?.let { message ->
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    visibleLoading.value = false
-                    resetPasswordViewModel.resetState()
+                    else -> {
+                        if (state.status == ResultStatusState.Successful)
+                            timeCountdown.value = 30
+                        visibleLoading.value = false
+                        email.value = ""
+                        state.message?.let { message ->
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        }
+                        resetPasswordViewModel.resetSate()
+                    }
                 }
             }
 
 
             Card(modifier = Modifier.width(cardWidth.dp)) {
+
                 val enableButton = remember {
                     derivedStateOf {
-                        email.value.isValidEmail()
+                        email.value.isValidEmail() && timeCountdown.value == 0
+                    }
+                }
+
+                val titleButton = remember {
+                    derivedStateOf {
+                        if (timeCountdown.value == 0) "Tiếp tục" else "Tiếp tục sau ${timeCountdown.value}s"
                     }
                 }
 
@@ -119,11 +132,10 @@ fun ResetPassword(
                     )
                     Spacer(modifier = Modifier.height(26.dp))
                     MyElevatedButton(
-                        title = "Tiếp tục",
+                        title = titleButton.value,
                         onClick = {
                             resetPasswordViewModel.sendRequestRestPassword(email.value)
                             focusManager.clearFocus()
-                            visibleLoading.value = true
                         },
                         enable = enableButton
                     )
@@ -134,7 +146,10 @@ fun ResetPassword(
                         color = Color(0xFFEC6767),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .clickable {
+                            .clickable(
+                                interactionSource = NoRippleInteractionSource(),
+                                indication = null
+                            ) {
                                 visible.value = false
                             }
                     )

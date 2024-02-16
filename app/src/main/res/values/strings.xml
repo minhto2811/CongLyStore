@@ -10,11 +10,6 @@
     <string name="facebook_client_token" translatable="false">421993006849134|2NPuLRlul6YuldEW0oEQhLJfIo4</string>
 
 
-    <string name="route_home">home</string>
-    <string name="route_auth">auth</string>
-    <string name="route_splash">splash</string>
-    <string name="route_settings">settings</string>
-    <string name="route_update_user">update_user</string>
 
 
 </resources>

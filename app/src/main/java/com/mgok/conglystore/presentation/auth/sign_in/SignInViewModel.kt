@@ -4,7 +4,8 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
-import com.mgok.conglystore.data.remote.UserRepository
+import com.mgok.conglystore.data.remote.user.UserRemoteRepositoryImpl
+import com.mgok.conglystore.presentation.auth.ResultStatusState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,40 +16,45 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRemoteRepository: UserRemoteRepositoryImpl
 ) : ViewModel() {
 
 
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 
-    fun isUserSignin(): Boolean {
-        return userRepository.userCurrent() != null
-    }
-
-    fun onSignInResult(result: Intent) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val signInState = userRepository.onSignInResult(result)
-            _state.update { signInState }
-        }
-    }
-
-    fun loginWithAccount(email: String, password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val signInState = userRepository.loginWithAccount(email, password)
-            _state.update { signInState }
-        }
-    }
 
     fun resetState() {
         _state.update { SignInState() }
     }
 
-    suspend fun googleAuthUiClientSignIn() = userRepository.googleAuthUiClientSignIn()
+    fun isUserSignin(): Boolean {
+        return userRemoteRepository.userCurrent() != null
+    }
+
+    fun onSignInResult(result: Intent) {
+        _state.update { SignInState(status = ResultStatusState.Loading) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val signInState = userRemoteRepository.onSignInResult(result)
+            _state.update { signInState }
+        }
+    }
+
+    fun loginWithAccount(email: String, password: String) {
+        _state.update { SignInState(status = ResultStatusState.Loading) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val signInState = userRemoteRepository.loginWithAccount(email, password)
+            _state.update { signInState }
+        }
+    }
+
+
+    suspend fun googleAuthUiClientSignIn() = userRemoteRepository.googleAuthUiClientSignIn()
 
     fun handleFacebookAccessToken(token: AccessToken) {
+        _state.update { SignInState(status = ResultStatusState.Loading) }
         viewModelScope.launch(Dispatchers.IO) {
-            val signInState = userRepository.handleFacebookAccessToken(token)
+            val signInState = userRemoteRepository.handleFacebookAccessToken(token)
             _state.update { signInState }
         }
     }
