@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -19,7 +18,6 @@ import com.mgok.conglystore.component.MyOutlineButton
 fun FacebookButton(
     callback: (AccessToken?) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val loginManager = LoginManager.getInstance()
     val callbackManager = remember { CallbackManager.Factory.create() }
     val launcher = rememberLauncherForActivityResult(

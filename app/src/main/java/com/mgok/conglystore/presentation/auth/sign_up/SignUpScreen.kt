@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,12 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mgok.conglystore.R
+import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyTextField
-import com.mgok.conglystore.utils.isValidEmail
-import com.mgok.conglystore.utils.isValidPassword
+import com.mgok.conglystore.presentation.auth.ResultStatusState
+import com.mgok.conglystore.utilities.NoRippleInteractionSource
+import com.mgok.conglystore.utilities.isValidEmail
+import com.mgok.conglystore.utilities.isValidPassword
 
 @Composable
 fun TabSignUp(
@@ -51,7 +54,7 @@ fun TabSignUp(
     ) {
         val context = LocalContext.current
         rememberCoroutineScope()
-        val state = signUpViewModel.state.collectAsStateWithLifecycle()
+        val state by signUpViewModel.state.collectAsStateWithLifecycle()
 
         val email = remember {
             mutableStateOf("")
@@ -74,30 +77,34 @@ fun TabSignUp(
             mutableStateOf(false)
         }
 
-        LaunchedEffect(key1 = state.value.isSignUpSuccessful) {
-            if (state.value.isSignUpSuccessful) {
-                Toast.makeText(context, "Đăng ký thành công", Toast.LENGTH_LONG).show()
-                password.value = ""
-                email.value = ""
-                mesage.value = ""
-                chagePageIndex(0)
-                signUpViewModel.resetState()
-                onNavigate.invoke(context.getString(R.string.route_update_user))
-                visibleDialog.value = false
-            }
+        LaunchedEffect(key1 = state.status) {
+            when (state.status) {
+                ResultStatusState.Successful -> {
+                    Toast.makeText(context, "Đăng ký thành công", Toast.LENGTH_LONG).show()
+                    password.value = ""
+                    email.value = ""
+                    mesage.value = ""
+                    chagePageIndex(0)
+                    onNavigate.invoke(MainActivity.Route.route_update_user)
+                }
 
+                ResultStatusState.Loading -> {
+                    visibleDialog.value = true
+                }
+
+                ResultStatusState.Default -> {
+                    visibleDialog.value = false
+                }
+
+                ResultStatusState.Error -> {
+                    Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
+                    mesage.value = state.error.toString()
+                }
+            }
         }
 
 
-        LaunchedEffect(key1 = state.value.signUpError) {
-            state.value.signUpError?.let { error ->
-                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                mesage.value = error
-                visibleDialog.value = false
-                signUpViewModel.resetState()
-            }
 
-        }
 
 
         LaunchedEffect(key1 = email.value, key2 = password.value) {
@@ -132,8 +139,8 @@ fun TabSignUp(
                 hint = "Nhập địa chỉ email",
                 keyboardType = KeyboardType.Email,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-   
-            )
+
+                )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Mật khẩu",
@@ -147,8 +154,8 @@ fun TabSignUp(
                 isPassword = true,
                 keyboardType = KeyboardType.Password,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-   
-            )
+
+                )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = mesage.value,
@@ -159,7 +166,6 @@ fun TabSignUp(
             MyElevatedButton(title = "Tiếp tục", onClick = {
                 signUpViewModel.createAccount(email = email.value, password = password.value)
                 focusManager.clearFocus()
-                visibleDialog.value = true
             }, enable = enableButton)
             Spacer(modifier = Modifier.height(43.dp))
 
@@ -178,13 +184,16 @@ fun TabSignUp(
                     withStyle(style = spanStyle.copy(color = Color(0xFF989898))) {
                         append("Đã có tài khoản? ")
                     }
-                    withStyle(style = spanStyle.copy(color = Color(0xFF648DDB))) {
+                    withStyle(style = spanStyle.copy(color = Color(0xFFC67C4E))) {
                         append("Đăng nhập")
                     }
                 },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .clickable {
+                    .clickable(
+                        interactionSource = NoRippleInteractionSource(),
+                        indication = null
+                    ) {
                         chagePageIndex(0)
                     }
             )

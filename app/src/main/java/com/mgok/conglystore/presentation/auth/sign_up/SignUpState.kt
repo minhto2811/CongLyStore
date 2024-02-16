@@ -1,6 +1,8 @@
 package com.mgok.conglystore.presentation.auth.sign_up
 
+import com.mgok.conglystore.presentation.auth.ResultStatusState
+
 data class SignUpState(
-    val isSignUpSuccessful: Boolean = false,
-    val signUpError: String? = null
+    val status: ResultStatusState = ResultStatusState.Default,
+    val error: String? = null,
 )

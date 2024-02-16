@@ -1,39 +1,32 @@
 package com.mgok.conglystore.presentation.home
 
-import android.graphics.drawable.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
+import com.mgok.conglystore.R
 
 data class BottomNavigationItem(
     val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    @DrawableRes
+    val icon: Int,
     val badgeCount: Int? = null
-){
-    companion object{
+) {
+    companion object {
         val itemsBottom = listOf(
             BottomNavigationItem(
                 title = "Trang chủ",
-                selectedIcon = Icons.Filled.Home,
-                unselectedIcon = Icons.Outlined.Home
+                icon = R.drawable.icon_home,
             ),
             BottomNavigationItem(
-                title = "Sổ ghi nợ",
-                selectedIcon = Icons.Filled.AccountBox,
-                unselectedIcon = Icons.Outlined.AccountBox
+                title = "Yêu thích",
+                icon = R.drawable.icon_heart,
             ),
             BottomNavigationItem(
-                title = "Tài khoản",
-                selectedIcon = Icons.Filled.Settings,
-                unselectedIcon = Icons.Outlined.Settings
+                title = "Giỏ hàng",
+                icon = R.drawable.icon_bag,
             ),
-
-            )
+            BottomNavigationItem(
+                title = "Thông báo",
+                icon = R.drawable.icon_notifiaction,
+            ),
+        )
     }
 }

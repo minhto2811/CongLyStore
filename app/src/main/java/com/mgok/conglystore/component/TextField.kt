@@ -1,7 +1,6 @@
 package com.mgok.conglystore.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,13 +27,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.mgok.conglystore.R
+import com.mgok.conglystore.utilities.NoRippleInteractionSource
 
-data class TrailingIconData(
-    val icon: ImageVector,
-    val onCLick: () -> Unit
-)
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyTextField(
     state: MutableState<String>,
@@ -48,7 +43,7 @@ fun MyTextField(
     maxChar: Int = 100,
     enableb: Boolean = true,
     onClickable: () -> Unit = {},
-    trailingIconData: TrailingIconData? = null
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val showPassword = remember {
         mutableStateOf(!isPassword)
@@ -61,9 +56,12 @@ fun MyTextField(
             }
         },
         enabled = enableb,
-        modifier = Modifier
+        modifier = modifier
             .size(width = 376.dp, height = 56.dp)
-            .clickable {
+            .clickable(
+                indication = null,
+                interactionSource = NoRippleInteractionSource()
+            ) {
                 onClickable()
             },
         textStyle = MaterialTheme.typography.labelSmall,
@@ -80,7 +78,7 @@ fun MyTextField(
         colors = OutlinedTextFieldDefaults.colors(
             errorBorderColor = Color(0xFFEC6767),
             unfocusedBorderColor = Color(0xFFD9D9D9),
-            focusedBorderColor = Color(0xFF648DDB)
+            focusedBorderColor = Color(0xFFC67C4E)
         ),
         keyboardOptions = KeyboardOptions(
             capitalization = capitalization,
@@ -101,13 +99,6 @@ fun MyTextField(
                     )
                 }
 
-            } else if (trailingIconData != null) {
-                IconButton(onClick = trailingIconData.onCLick) {
-                    Image(
-                        imageVector = trailingIconData.icon,
-                        contentDescription = "trailing icon",
-                    )
-                }
             }
         },
 

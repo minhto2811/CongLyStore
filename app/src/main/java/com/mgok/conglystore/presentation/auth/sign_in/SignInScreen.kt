@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,12 +16,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,17 +45,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
-import com.mgok.conglystore.component.Line1
+import com.mgok.conglystore.Session.setUserSession
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyOutlineButton
 import com.mgok.conglystore.component.MyTextField
+import com.mgok.conglystore.presentation.auth.ResultStatusState
 import com.mgok.conglystore.presentation.auth.reset_password.ResetPassword
 import com.mgok.conglystore.presentation.auth.reset_password.ResetPasswordViewModel
-import com.mgok.conglystore.presentation.auth.user.UserViewModel
-import com.mgok.conglystore.utils.isValidEmail
-import com.mgok.conglystore.utils.isValidPassword
+import com.mgok.conglystore.presentation.user.UserViewModel
+import com.mgok.conglystore.utilities.NoRippleInteractionSource
+import com.mgok.conglystore.utilities.isValidEmail
+import com.mgok.conglystore.utilities.isValidPassword
 import kotlinx.coroutines.launch
 
 
@@ -59,10 +67,12 @@ fun TabSignIn(
     signInViewModel: SignInViewModel = hiltViewModel(),
     resetPasswordViewModel: ResetPasswordViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
+    timeCountdown: MutableState<Int>,
     chagePageIndex: (Int) -> Unit,
     onNavigate: (String) -> Unit,
-) {
-    val state = signInViewModel.state.collectAsStateWithLifecycle()
+
+    ) {
+    val state by signInViewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -99,32 +109,35 @@ fun TabSignIn(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = state.value.isSignInSuccessful) {
-        if (state.value.isSignInSuccessful) {
-            userViewModel.checkNewUser { isNew ->
+    LaunchedEffect(key1 = state.status) {
+        when (state.status) {
+            ResultStatusState.Successful -> {
+                mesage.value = ""
+                val infoUser = userViewModel.getInfoUser()
+                setUserSession(infoUser)
                 val route =
-                    if (isNew) context.getString(R.string.route_update_user) else context.getString(
-                        R.string.route_settings
-                    )
+                    if (infoUser == null) MainActivity.Route.route_update_user else MainActivity.Route.route_home
                 onNavigate.invoke(route)
+                signInViewModel.resetState()
             }
-            mesage.value = ""
-            signInViewModel.resetState()
-            visibleDialog.value = false
-        }
 
-    }
+            ResultStatusState.Loading -> {
+                visibleDialog.value = true
+            }
 
+            ResultStatusState.Error -> {
+                Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
+                mesage.value = state.error.toString()
+            }
 
-
-    LaunchedEffect(key1 = state.value.signInError) {
-        state.value.signInError?.let { error ->
-            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-            mesage.value = error
-            visibleDialog.value = false
-            signInViewModel.resetState()
+            ResultStatusState.Default -> {
+                visibleDialog.value = false
+            }
         }
     }
+
+
+
 
     LaunchedEffect(key1 = email.value, key2 = password.value) {
         mesage.value =
@@ -135,6 +148,7 @@ fun TabSignIn(
 
 
     }
+
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -189,10 +203,13 @@ fun TabSignIn(
             Text(
                 text = "Quên mật khẩu?",
                 style = MaterialTheme.typography.titleSmall,
-                color = Color(0xFF648DDB),
-                modifier = Modifier.clickable {
+                color = Color(0xFFC67C4E),
+                modifier = Modifier.clickable(
+                    interactionSource = NoRippleInteractionSource(),
+                    indication = null
+                ) {
                     visibleResetPassword.value = true
-                }
+                },
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -211,14 +228,22 @@ fun TabSignIn(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Line1()
+            Box(
+                modifier = Modifier
+                    .size(width = 98.dp, height = 2.dp)
+                    .background(color = Color(0xFFE1E1E1))
+            )
             Text(
                 text = "hoặc",
                 style = MaterialTheme.typography.titleSmall,
                 color = Color(0xFFE1E1E1),
                 modifier = Modifier.padding(horizontal = 14.dp)
             )
-            Line1()
+            Box(
+                modifier = Modifier
+                    .size(width = 98.dp, height = 2.dp)
+                    .background(color = Color(0xFFE1E1E1))
+            )
 
         }
         Spacer(modifier = Modifier.height(43.dp))
@@ -260,13 +285,16 @@ fun TabSignIn(
                 withStyle(style = spanStyle.copy(color = Color(0xFF989898))) {
                     append("Bạn không có tài khoản? ")
                 }
-                withStyle(style = spanStyle.copy(color = Color(0xFF648DDB))) {
+                withStyle(style = spanStyle.copy(color = Color(0xFFC67C4E))) {
                     append("Đăng ký")
                 }
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .clickable {
+                .clickable(
+                    interactionSource = NoRippleInteractionSource(),
+                    indication = null
+                ) {
                     chagePageIndex.invoke(1)
                 }
         )
@@ -278,7 +306,8 @@ fun TabSignIn(
     ResetPassword(
         visible = visibleResetPassword,
         resetPasswordViewModel = resetPasswordViewModel,
-        visibleLoading = visibleDialog
+        visibleLoading = visibleDialog,
+        timeCountdown = timeCountdown
     )
 
     MyLoadingDialog(visible = visibleDialog)

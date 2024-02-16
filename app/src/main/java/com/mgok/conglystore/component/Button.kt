@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.mgok.conglystore.utilities.NoRippleInteractionSource
 
 @Composable
 fun TextButtonNormal(onClick: () -> Unit, title: String) {
@@ -45,11 +46,12 @@ fun MyElevatedButton(title: String, onClick: () -> Unit, enable: State<Boolean>)
         onClick = onClick,
         modifier = Modifier.size(width = 376.dp, height = 56.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = Color(0xFF648DDB),
-            disabledContainerColor = Color(0x66648DDB)
+            containerColor = Color(0xFFC67C4E),
+            disabledContainerColor = Color(0x66C67C4E)
         ),
         shape = RoundedCornerShape(12.dp),
-        enabled = enable.value
+        enabled = enable.value,
+        interactionSource = NoRippleInteractionSource()
     ) {
         Text(
             text = title,

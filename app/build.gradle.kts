@@ -61,10 +61,10 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-//    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material3:material3-android:1.2.0-rc01")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.compose.material3:material3-android:1.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.airbnb.android:lottie-compose:6.3.0")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -73,10 +73,14 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("androidx.compose.runtime:runtime-android:1.6.1")
+
     //firebase
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.10.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.2")
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
@@ -93,4 +97,18 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-android-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    //contrains layout
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    //room
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+//noinspection KaptUsageInsteadOfKsp
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    //map
+    implementation("com.google.maps.android:maps-compose:1.0.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
 }

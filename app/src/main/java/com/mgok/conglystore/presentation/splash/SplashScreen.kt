@@ -7,16 +7,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
+import com.mgok.conglystore.Session.setUserSession
 import com.mgok.conglystore.presentation.auth.sign_in.SignInViewModel
-import com.mgok.conglystore.presentation.auth.user.UserViewModel
+import com.mgok.conglystore.presentation.user.UserViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -25,20 +26,19 @@ fun SplashScreen(
     userViewModel: UserViewModel = hiltViewModel(),
     callback: (String) -> Unit
 ) {
-    val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
-        var route = ""
+        delay(200)
+        var route =  MainActivity.Route.route_auth
         if (signInViewModel.isUserSignin()) {
-            userViewModel.checkNewUser { isNew ->
-                route =
-                    if (isNew) context.getString(R.string.route_update_user) else context.getString(
-                        R.string.route_settings
-                    )
-            }
-        } else {
-            route = context.getString(R.string.route_auth)
+            val infoUser = userViewModel.getInfoUser()
+            route =
+                if (infoUser == null) {
+                    MainActivity.Route.route_update_user
+                } else {
+                    setUserSession(infoUser)
+                    MainActivity.Route.route_home
+                }
         }
-        delay(2000)
         callback.invoke(route)
     }
     val composition: LottieComposition? =
