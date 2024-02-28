@@ -3,7 +3,6 @@ package com.mgok.conglystore.presentation.auth.sign_in
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,11 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -45,36 +41,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
-import com.mgok.conglystore.Session.setUserSession
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyOutlineButton
 import com.mgok.conglystore.component.MyTextField
-import com.mgok.conglystore.presentation.auth.ResultStatusState
-import com.mgok.conglystore.presentation.auth.reset_password.ResetPassword
-import com.mgok.conglystore.presentation.auth.reset_password.ResetPasswordViewModel
-import com.mgok.conglystore.presentation.user.UserViewModel
+import com.mgok.conglystore.presentation.auth.reset_password.ResetPasswordScreen
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
-import com.mgok.conglystore.utilities.isValidEmail
-import com.mgok.conglystore.utilities.isValidPassword
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun TabSignIn(
     signInViewModel: SignInViewModel = hiltViewModel(),
-    resetPasswordViewModel: ResetPasswordViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel(),
     timeCountdown: MutableState<Int>,
     chagePageIndex: (Int) -> Unit,
     onNavigate: (String) -> Unit,
-
-    ) {
+) {
     val state by signInViewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
 
     val launcher = rememberLauncherForActivityResult(
@@ -85,68 +69,16 @@ fun TabSignIn(
             }
         }
     )
-    val email = remember {
-        mutableStateOf("")
-    }
-    val password = remember {
-        mutableStateOf("")
-    }
-    val mesage = remember {
-        mutableStateOf("")
-    }
 
-    val enableButton = remember {
-        derivedStateOf {
-            email.value.isValidEmail() && password.value.isValidPassword()
-        }
-    }
-
-    val visibleDialog = remember {
-        mutableStateOf(false)
-    }
-
-    val visibleResetPassword = remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(key1 = state.status) {
-        when (state.status) {
-            ResultStatusState.Successful -> {
-                mesage.value = ""
-                val infoUser = userViewModel.getInfoUser()
-                setUserSession(infoUser)
-                val route =
-                    if (infoUser == null) MainActivity.Route.route_update_user else MainActivity.Route.route_home
-                onNavigate.invoke(route)
-                signInViewModel.resetState()
-            }
-
-            ResultStatusState.Loading -> {
-                visibleDialog.value = true
-            }
-
-            ResultStatusState.Error -> {
-                Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
-                mesage.value = state.error.toString()
-            }
-
-            ResultStatusState.Default -> {
-                visibleDialog.value = false
-            }
-        }
+    LaunchedEffect(state.route) {
+        state.route?.let { onNavigate.invoke(it) }
     }
 
 
 
 
-    LaunchedEffect(key1 = email.value, key2 = password.value) {
-        mesage.value =
-            if (email.value.isEmpty() || email.value.isValidEmail()) "" else "Email không hợp lệ"
-        if (mesage.value.isEmpty())
-            mesage.value =
-                if (password.value.isEmpty() || password.value.isValidPassword()) "" else "Mật khẩu nhiều hơn 5 kí tự"
-
-
+    LaunchedEffect(key1 = state.error) {
+        state.error?.let{ Toast.makeText(context, it, Toast.LENGTH_LONG).show()}
     }
 
 
@@ -167,7 +99,7 @@ fun TabSignIn(
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyTextField(
-            state = email,
+            state = signInViewModel.email,
             hint = "Nhập địa chỉ email",
             keyboardType = KeyboardType.Email,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -181,7 +113,7 @@ fun TabSignIn(
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyTextField(
-            state = password,
+            state = signInViewModel.password,
             hint = "Nhập mật khẩu",
             isPassword = true,
             keyboardType = KeyboardType.Password,
@@ -196,7 +128,7 @@ fun TabSignIn(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = mesage.value,
+                text = signInViewModel.mesage.value,
                 style = MaterialTheme.typography.titleSmall,
                 color = Color(0xFFEC6767)
             )
@@ -208,7 +140,7 @@ fun TabSignIn(
                     interactionSource = NoRippleInteractionSource(),
                     indication = null
                 ) {
-                    visibleResetPassword.value = true
+                    signInViewModel.tongleDialogPassword()
                 },
             )
         }
@@ -216,11 +148,10 @@ fun TabSignIn(
 
         MyElevatedButton(
             title = "Tiếp tục", onClick = {
-                signInViewModel.loginWithAccount(email.value, password.value)
+                signInViewModel.loginWithAccount()
                 focusManager.clearFocus()
-                visibleDialog.value = true
             },
-            enable = enableButton
+            enable = signInViewModel.enableButton
         )
         Spacer(modifier = Modifier.height(43.dp))
         Row(
@@ -259,14 +190,7 @@ fun TabSignIn(
 
         MyOutlineButton(
             onClick = {
-                coroutineScope.launch {
-                    val signInIntentSender = signInViewModel.googleAuthUiClientSignIn()
-                    signInIntentSender?.let {
-                        launcher.launch(
-                            IntentSenderRequest.Builder(it).build()
-                        )
-                    }
-                }
+                signInViewModel.onGoogleLogin(launcher)
             },
             idLogoResource = R.drawable.logo_google,
             title = "Đăng nhập bằng Google"
@@ -302,14 +226,13 @@ fun TabSignIn(
 
     }
 
+    if (state.visibleDialog) {
+        ResetPasswordScreen(timeCountdown = timeCountdown) {
+            signInViewModel.tongleDialogPassword()
+        }
+    }
 
-    ResetPassword(
-        visible = visibleResetPassword,
-        resetPasswordViewModel = resetPasswordViewModel,
-        visibleLoading = visibleDialog,
-        timeCountdown = timeCountdown
-    )
 
-    MyLoadingDialog(visible = visibleDialog)
+    MyLoadingDialog(visible = state.loading)
 
 }

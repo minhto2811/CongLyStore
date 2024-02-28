@@ -43,7 +43,8 @@ fun MyTextField(
     maxChar: Int = 100,
     enableb: Boolean = true,
     onClickable: () -> Unit = {},
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    onValidate: (() -> Unit)? = null
 ) {
     val showPassword = remember {
         mutableStateOf(!isPassword)
@@ -54,6 +55,7 @@ fun MyTextField(
             if (text.length <= maxChar) {
                 state.value = if (hasSpace) text.replace("  ", " ") else text.trim()
             }
+            onValidate?.invoke()
         },
         enabled = enableb,
         modifier = modifier

@@ -1,9 +1,12 @@
 package com.mgok.conglystore.presentation.auth.reset_password
 
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mgok.conglystore.data.remote.user.UserRemoteRepositoryImpl
-import com.mgok.conglystore.presentation.auth.ResultStatusState
+import com.mgok.conglystore.usecases.user.ResetPasswordUseCase
+import com.mgok.conglystore.utilities.isValidEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,23 +17,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ResetPasswordViewModel @Inject constructor(
-    private val userRemoteRepository: UserRemoteRepositoryImpl
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ResetPasswordState())
-    val state = _state.asStateFlow()
+    private val _stateUI = MutableStateFlow(ResetPasswordState())
+    val stateUI = _stateUI.asStateFlow()
 
+    val email = mutableStateOf("")
 
-
-    fun sendRequestRestPassword(email: String) {
-        _state.update { ResetPasswordState(status = ResultStatusState.Loading) }
-        viewModelScope.launch(Dispatchers.IO) {
-            val resetPasswordState = userRemoteRepository.sendRequestRestPassword(email)
-            _state.update { resetPasswordState }
-        }
+    val enableButton by
+    derivedStateOf {
+        email.value.isValidEmail()
     }
 
-    fun resetSate(){
-        _state.update { ResetPasswordState(status = ResultStatusState.Default) }
+
+    fun sendRequestRestPassword() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _stateUI.update { it.copy(loading = true, message = null) }
+                resetPasswordUseCase.sendRequestResetPassword(email.value)
+                email.value = ""
+                _stateUI.update { it.copy(loading = false, message = "Kiểm tra email của bạn") }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _stateUI.update { it.copy(loading = false, message = "Đã xảy ra lỗi") }
+            }
+        }
     }
 }

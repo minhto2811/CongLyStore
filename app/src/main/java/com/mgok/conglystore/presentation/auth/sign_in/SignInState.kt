@@ -1,8 +1,9 @@
 package com.mgok.conglystore.presentation.auth.sign_in
 
-import com.mgok.conglystore.presentation.auth.ResultStatusState
-
 data class SignInState(
-    val status: ResultStatusState = ResultStatusState.Default,
+    val loginSuccess: Boolean = false,
+    val loading: Boolean = false,
     val error: String? = null,
+    val visibleDialog: Boolean = false,
+    val route: String? = null
 )
