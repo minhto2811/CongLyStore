@@ -8,7 +8,6 @@ data class User(
     val birthday: Long = 1,
     val role: Int = 1,
     val gender: Int = 1,
-    val favorites: ArrayList<String> = arrayListOf()
 )
 
 

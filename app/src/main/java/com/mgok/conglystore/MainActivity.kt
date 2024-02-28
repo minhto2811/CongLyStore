@@ -9,28 +9,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.mgok.conglystore.presentation.address.add_address.NewAddressScreen
+import com.mgok.conglystore.presentation.address.list_address.AddressScreen
+import com.mgok.conglystore.presentation.address.map.MapScreen
 import com.mgok.conglystore.presentation.auth.AuthScreen
-import com.mgok.conglystore.presentation.coffee.CoffeeViewModel
 import com.mgok.conglystore.presentation.coffee.detail.DetailProductScreen
-import com.mgok.conglystore.presentation.coffee.product.CoffeeScreen
+import com.mgok.conglystore.presentation.coffee.manager_coffee_type.CoffeeTypeScreen
+import com.mgok.conglystore.presentation.coffee.manager_product.NewCoffeeScreen
 import com.mgok.conglystore.presentation.coffee.search.SearchCoffeeScreen
-import com.mgok.conglystore.presentation.coffee.type.CoffeeTypeScreen
 import com.mgok.conglystore.presentation.home.HomeScreen
-import com.mgok.conglystore.presentation.map.MapViewModel
+import com.mgok.conglystore.presentation.order.OrderScreen
+import com.mgok.conglystore.presentation.order.OrderViewModel
 import com.mgok.conglystore.presentation.splash.SplashScreen
-import com.mgok.conglystore.presentation.user.SettingsScreen
-import com.mgok.conglystore.presentation.user.UpdateInfoUserScreen
+import com.mgok.conglystore.presentation.user.settings.SettingsScreen
+import com.mgok.conglystore.presentation.user.update.UpdateInfoUserScreen
 import com.mgok.conglystore.ui.theme.CongLyStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val coffeeViewModel: CoffeeViewModel by viewModels()
-    private val mapViewModel: MapViewModel by viewModels()
+    private val orderViewModel: OrderViewModel by viewModels()
 
 
     object Route {
@@ -41,8 +45,12 @@ class MainActivity : ComponentActivity() {
         const val route_settings = "settings"
         const val route_coffee_type = "coffee_type"
         const val route_coffee = "coffee"
-        const val route_detail_coffe = "detail_coffe"
+        const val route_detail_coffee = "detail_coffee/{coffeeId}"
         const val route_search = "search_coffee"
+        const val rout_order = "order"
+        const val route_address = "address"
+        const val route_new_address = "new_address"
+        const val route_map = "map"
     }
 
 
@@ -71,7 +79,12 @@ class MainActivity : ComponentActivity() {
 
                         composable(Route.route_auth) {
                             AuthScreen { route ->
-                                navController.navigate(route)
+                                navController.navigate(route) {
+                                    popUpTo(route) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
                             }
                         }
                         composable(Route.route_update_user) {
@@ -84,17 +97,17 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(Route.route_splash) {
                                             inclusive = true
                                         }
+                                        launchSingleTop = true
                                     }
                                 }
                             )
                         }
                         composable(Route.route_home) {
                             HomeScreen(
-                                coffeeViewModel = coffeeViewModel,
-                                mapViewModel = mapViewModel,
                                 changePage = { route ->
                                     navController.navigate(route)
-                                }
+                                },
+                                orderViewModel = orderViewModel
                             )
                         }
 
@@ -102,25 +115,31 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 onSignOut = {
                                     navController.navigate(Route.route_splash)
+                                },
+                                changePage = { route ->
+                                    navController.navigate(route)
+
                                 }
                             )
                         }
 
                         composable(Route.route_coffee_type) {
-                            CoffeeTypeScreen(
-                                coffeeViewModel = coffeeViewModel
-                            )
+                            CoffeeTypeScreen()
                         }
 
+                        //admin
                         composable(Route.route_coffee) {
-                            CoffeeScreen(
-                                coffeeViewModel = coffeeViewModel
-                            )
+                            NewCoffeeScreen()
                         }
 
-                        composable(Route.route_detail_coffe) {
+                        composable(
+                            Route.route_detail_coffee,
+                            arguments = listOf(navArgument("coffeeId") {
+                                type = NavType.StringType
+                            })
+                        ) { backStackEntry ->
                             DetailProductScreen(
-                                coffeeViewModel = coffeeViewModel,
+                                coffeeId = backStackEntry.arguments?.getString("coffeeId")!!,
                                 onPop = {
                                     navController.popBackStack()
                                 }
@@ -129,7 +148,6 @@ class MainActivity : ComponentActivity() {
 
                         composable(Route.route_search) {
                             SearchCoffeeScreen(
-                                coffeeViewModel = coffeeViewModel,
                                 changePage = { route ->
                                     navController.navigate(route)
                                 },
@@ -138,12 +156,44 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        composable(Route.rout_order) {
+                            OrderScreen(
+                                orderViewModel = orderViewModel
+                            )
+                        }
+
+                        composable(Route.route_address) {
+                            AddressScreen(
+                                changePage = {
+                                    navController.navigate(Route.route_new_address)
+                                },
+                                onPop = {
+                                    navController.popBackStack()
+                                })
+                        }
+
+                        composable(Route.route_new_address) {
+                            NewAddressScreen(
+                                onPop = {
+                                    navController.popBackStack()
+                                },
+                                changePage = { route ->
+                                    navController.navigate(route)
+                                }
+                            )
+                        }
+
+                        composable(Route.route_map) {
+                            MapScreen(onPop = { /*TODO*/ })
+                        }
                     }
 
                 }
             }
         }
     }
+
 }
 
 

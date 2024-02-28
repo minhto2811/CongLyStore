@@ -1,9 +1,17 @@
 package com.mgok.conglystore.presentation.auth.sign_up
 
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mgok.conglystore.data.remote.user.UserRemoteRepositoryImpl
-import com.mgok.conglystore.presentation.auth.ResultStatusState
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.mgok.conglystore.usecases.user.CreateAccountUseCase
+import com.mgok.conglystore.utilities.isValidEmail
+import com.mgok.conglystore.utilities.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,16 +22,67 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val userRemoteRepository: UserRemoteRepositoryImpl
+    private val createAccountUseCase: CreateAccountUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(SignUpState())
     val state = _state.asStateFlow()
 
-    fun createAccount(email: String, password: String) {
-        _state.update { SignUpState(status = ResultStatusState.Loading) }
+
+    val email = mutableStateOf("")
+    val password = mutableStateOf("")
+    var warning by mutableStateOf("")
+
+    val enableButton by derivedStateOf {
+        email.value.isValidEmail() && password.value.isValidPassword()
+    }
+
+
+    fun validate() {
+        if (email.value.isNotEmpty() && !email.value.isValidEmail()) {
+            warning = "Email không hợp lệ"
+        } else if (password.value.isNotEmpty() && !password.value.isValidPassword()) {
+            warning = "Mật khẩu nhiều hơn 5 kí tự"
+        }
+    }
+
+    fun createAccount() {
         viewModelScope.launch(Dispatchers.IO) {
-            val signUpState = userRemoteRepository.createAccount(email, password)
-            _state.update { signUpState }
+            try {
+                _state.update { it.copy(loading = true) }
+                createAccountUseCase.createAccount(email.value, password.value)
+                _state.update { it.copy(loading = false, message = "Tạo tài khoản thành công") }
+                email.value = ""
+                password.value = ""
+                warning = ""
+            } catch (e: FirebaseAuthWeakPasswordException) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        message = "Mật khẩu nhiều hơn 5 kí tự"
+                    )
+                }
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        message = "Email không hợp lệ"
+                    )
+                }
+            } catch (e: IllegalArgumentException) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        message = "Hãy điền đầy đủ thông tin"
+                    )
+                }
+            } catch (e: FirebaseAuthUserCollisionException) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        message = "Email đã được đăng ký"
+                    )
+                }
+            }
         }
     }
 

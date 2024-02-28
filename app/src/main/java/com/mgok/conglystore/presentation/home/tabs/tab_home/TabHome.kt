@@ -1,7 +1,10 @@
 package com.mgok.conglystore.presentation.home.tabs.tab_home
 
+import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.widget.Toast
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -40,9 +44,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,65 +61,72 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
-import com.mgok.conglystore.Session.getUserSession
 import com.mgok.conglystore.component.BottomSheet
 import com.mgok.conglystore.component.CoffeeItem
-import com.mgok.conglystore.presentation.coffee.CoffeeStatusState
-import com.mgok.conglystore.presentation.coffee.CoffeeViewModel
-import com.mgok.conglystore.presentation.map.MapViewModel
+import com.mgok.conglystore.component.RequiresPermissionDialog
+import com.mgok.conglystore.data.remote.cart.Cart
+import com.mgok.conglystore.data.remote.coffee.Coffee
+import com.mgok.conglystore.data.remote.coffee_type.CoffeeType
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabHome(
-    mapViewModel: MapViewModel,
-    coffeeViewModel: CoffeeViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     drawerState: DrawerState,
     changePage: (String) -> Unit,
 ) {
 
-    val stateCoffee by coffeeViewModel.state.collectAsState()
-    val stateMap by mapViewModel.state.collectAsState()
+
+    val stateUI by homeViewModel.stateUI.collectAsState()
 
 
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet = remember { mutableStateOf(false) }
+    val coffeeSelected = remember { mutableStateOf<Coffee?>(null) }
 
     val context = LocalContext.current
+    val visiblePermission = remember {
+        mutableStateOf(false)
+    }
+
+    val locationPermission = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
     val launcherLocationPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissions ->
         val check = permissions.values.reduce { acc, next -> acc && next }
         if (check) {
-            mapViewModel.getLocationCurrent(context)
+            homeViewModel.getLocation()
         } else {
-            Toast.makeText(context, "Quyền vị trí bị từ chối", Toast.LENGTH_SHORT).show()
+            visiblePermission.value = true
         }
     }
 
-    val locationPermission = arrayOf(
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_FINE_LOCATION,
-    )
+
+
 
     LaunchedEffect(key1 = Unit) {
         if (locationPermission.all {
                 ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
             }) {
-            mapViewModel.getLocationCurrent(context)
+            homeViewModel.getLocation()
         } else {
             launcherLocationPermission.launch(locationPermission)
         }
-
     }
 
 
@@ -130,21 +139,16 @@ fun TabHome(
         0f to Color(0xFF313131),
         1f to Color(0xFF131313)
     )
-    val chipState = remember {
-        mutableStateOf("")
+
+    RequiresPermissionDialog(visiblePermission) {
+        visiblePermission.value = false
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", context.packageName, null)
+        intent.data = uri
+        context.startActivity(intent)
     }
 
-    val listProduct = remember {
-        derivedStateOf {
-            stateCoffee.listCoffee.filter { it.name == chipState.value }
-        }
-    }
 
-    LaunchedEffect(key1 = stateCoffee.listCoffeeType) {
-        if (stateCoffee.listCoffeeType.isNotEmpty()) {
-            chipState.value = stateCoffee.listCoffeeType[0].name
-        }
-    }
 
 
     LazyVerticalGrid(
@@ -187,7 +191,7 @@ fun TabHome(
                     },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (getUserSession()?.role == 0) {
+                    if (stateUI.user?.role == 0) {
                         IconButton(
                             onClick = {
                                 coroutineScope.launch {
@@ -217,9 +221,14 @@ fun TabHome(
                         )
 
                         Text(
-                            text = stateMap.location,
+                            text = stateUI.location,
                             style = MaterialTheme.typography.titleMedium,
                             color = Color(0xFFFFFFFF),
+                            modifier = Modifier.width(150.dp).clickable {
+                                launcherLocationPermission.launch(locationPermission)
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -227,7 +236,7 @@ fun TabHome(
 
 
                 SubcomposeAsyncImage(
-                    model = getUserSession()?.avatar,
+                    model = stateUI.user?.avatar,
                     contentDescription = "avatar",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -283,33 +292,35 @@ fun TabHome(
                             start.linkTo(parent.start, 0.dp)
                         }
                         .padding(top = 20.dp, bottom = 20.dp),
-                    chipState = chipState,
-                    state = stateCoffee
+                    homeViewModel = homeViewModel,
+                    coffeeTypes = stateUI.listCoffeeType
                 )
             }
         }
-        items(listProduct.value.size) { index ->
-            val item = listProduct.value[index]
+        items(stateUI.listCoffee.size) { index ->
+            val item = stateUI.listCoffee[index]
             CoffeeItem(coffe = item, isRight = index % 2 == 0, onClick = {
-                coffeeViewModel.setCoffeeSelected(item)
-                changePage.invoke(MainActivity.Route.route_detail_coffe)
+                changePage.invoke("detail_coffee/${item.id}")
             }, addToCart = {
-                coffeeViewModel.setCoffeeSelected(item)
-                showBottomSheet.value = true
+                coffeeSelected.value = item
             })
         }
     }
 
-    stateCoffee.coffeeSelected?.let { coffee ->
-        BottomSheet(
-            showBottomSheet = showBottomSheet, sheetState = sheetState, scope = scope, coffee
-        )
+
+    BottomSheet(
+        coffee = coffeeSelected, sheetState = sheetState
+    ) { id, size ->
+        val cart = Cart(idCoffee = id, size = size)
+        homeViewModel.addCart(cart)
     }
+
+
 }
 
 
 @Composable
-fun ChipBar(modifier: Modifier, chipState: MutableState<String>, state: CoffeeStatusState) {
+fun ChipBar(modifier: Modifier, homeViewModel: HomeViewModel, coffeeTypes: List<CoffeeType>) {
     val lazyChipsState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     LazyRow(
@@ -318,18 +329,19 @@ fun ChipBar(modifier: Modifier, chipState: MutableState<String>, state: CoffeeSt
         contentPadding = PaddingValues(horizontal = 30.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(state.listCoffeeType.size) { index ->
-            val item = state.listCoffeeType[index].name
+        items(coffeeTypes.size) { index ->
+            val item = coffeeTypes[index].name
             ElevatedAssistChip(
                 onClick = {
                     coroutineScope.launch {
-                        chipState.value = item
+                        homeViewModel.chipState.intValue = index
+                        homeViewModel.getListCoffeeByName()
                         lazyChipsState.animateScrollToItem(index)
                     }
                 },
                 label = {
                     Text(
-                        text = state.listCoffeeType[index].name,
+                        text = item,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                     )
@@ -337,10 +349,10 @@ fun ChipBar(modifier: Modifier, chipState: MutableState<String>, state: CoffeeSt
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp)),
                 colors = AssistChipDefaults.elevatedAssistChipColors(
-                    containerColor = if (item == chipState.value) Color(0xFFC67C4E) else Color(
+                    containerColor = if (index == homeViewModel.chipState.intValue) Color(0xFFC67C4E) else Color(
                         0xFFFFFFFF
                     ),
-                    labelColor = if (item == chipState.value) Color(0xFFFFFFFF) else Color(
+                    labelColor = if (index == homeViewModel.chipState.intValue) Color(0xFFFFFFFF) else Color(
                         0xFF2F4B4E
                     )
                 ),

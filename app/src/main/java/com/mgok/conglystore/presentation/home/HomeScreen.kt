@@ -4,8 +4,11 @@ package com.mgok.conglystore.presentation.home
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
@@ -13,6 +16,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -20,6 +24,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -40,12 +45,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.mgok.conglystore.MainActivity
-import com.mgok.conglystore.presentation.coffee.CoffeeViewModel
 import com.mgok.conglystore.presentation.home.tabs.tab_cart.TabCart
 import com.mgok.conglystore.presentation.home.tabs.tab_fav.TabFavorite
 import com.mgok.conglystore.presentation.home.tabs.tab_home.TabHome
 import com.mgok.conglystore.presentation.home.tabs.tab_notify.TabNotify
-import com.mgok.conglystore.presentation.map.MapViewModel
+import com.mgok.conglystore.presentation.order.OrderViewModel
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -54,8 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     changePage: (String) -> Unit,
-    coffeeViewModel: CoffeeViewModel,
-    mapViewModel: MapViewModel
+    orderViewModel: OrderViewModel
 ) {
     val coroutine = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { BottomNavigationItem.itemsBottom.size })
@@ -71,11 +74,21 @@ fun HomeScreen(
                     Icons.Default.ShoppingCart to "Doanh thu",
                     Icons.Default.ShoppingCart to "Thống kê",
                 )
-                Text(
-                    "Quản lí trực tuyến",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Quản lí trực tuyến",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    IconButton(onClick = {
+                        coroutine.launch { drawerState.close() }
+                    }) {
+                        Icon(Icons.Default.Close, "")
+                    }
+                }
                 HorizontalDivider()
                 drawerList.forEachIndexed { index, item ->
                     NavigationDrawerItem(
@@ -104,7 +117,7 @@ fun HomeScreen(
                 }
             }
         },
-        gesturesEnabled = true
+        gesturesEnabled = false
     ) {
 
         Scaffold(
@@ -120,8 +133,7 @@ fun HomeScreen(
                 paddingValue = paddingValue,
                 changePage = changePage,
                 drawerState = drawerState,
-                coffeeViewModel = coffeeViewModel,
-                mapViewModel = mapViewModel
+                orderViewModel = orderViewModel
             )
         }
     }
@@ -138,8 +150,7 @@ fun BottomBar(pagerState: PagerState, coroutine: CoroutineScope) {
             .border(
                 border = BorderStroke(1.dp, color = Color(0xFFF1F1F1)),
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-            )
-           ,
+            ),
         containerColor = Color(0xFFFFFFFF),
     ) {
         BottomNavigationItem.itemsBottom.forEachIndexed { index, item ->
@@ -180,26 +191,27 @@ fun TabsContent(
     paddingValue: PaddingValues,
     changePage: (String) -> Unit,
     drawerState: DrawerState,
-    coffeeViewModel: CoffeeViewModel,
-    mapViewModel: MapViewModel,
+    orderViewModel: OrderViewModel
 ) {
     HorizontalPager(
+        userScrollEnabled = false,
         state = pagerState,
         contentPadding = PaddingValues(bottom = paddingValue.calculateBottomPadding())
     ) { page ->
         when (page) {
             0 -> TabHome(
-                coffeeViewModel = coffeeViewModel,
                 drawerState = drawerState,
                 changePage = changePage,
-                mapViewModel = mapViewModel
             )
 
             1 -> TabFavorite(
-                coffeeViewModel = coffeeViewModel,
                 changePage = changePage,
             )
-            2 -> TabCart()
+
+            2 -> TabCart(
+                changePage = changePage,
+            )
+
             3 -> TabNotify()
             else -> {}
         }

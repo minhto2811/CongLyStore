@@ -3,14 +3,12 @@ package com.mgok.conglystore.presentation.auth.sign_in
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.util.Log
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.mgok.conglystore.R
-import com.mgok.conglystore.presentation.auth.ResultStatusState
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -33,22 +31,11 @@ class GoogleAuthUiClient(
         return result?.pendingIntent?.intentSender
     }
 
-    suspend fun signInWithIntent(intent: Intent): SignInState {
+    suspend fun signInWithIntent(intent: Intent) {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-        return try {
-            val task = auth.signInWithCredential(googleCredentials).await()
-            SignInState(
-                status = ResultStatusState.Successful
-            )
-        } catch (e: Exception) {
-            Log.e("ghg signInWithIntent", e.toString())
-            SignInState(
-                status = ResultStatusState.Error,
-                error = e.message
-            )
-        }
+        auth.signInWithCredential(googleCredentials).await()
     }
 
     suspend fun signOut() {

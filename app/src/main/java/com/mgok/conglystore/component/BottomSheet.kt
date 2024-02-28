@@ -3,6 +3,7 @@ package com.mgok.conglystore.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,28 +33,26 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.mgok.conglystore.data.remote.coffee.Coffee
-import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
-    showBottomSheet: MutableState<Boolean>,
+    coffee: MutableState<Coffee?>,
     sheetState: SheetState,
-    scope: CoroutineScope,
-    coffeeSelected: Coffee
+    addToCart: (String, String) -> Unit
 ) {
-    val sizeState = remember {
-        mutableStateOf(coffeeSelected.sizes[0])
-    }
-    if (showBottomSheet.value) {
+    if (coffee.value != null) {
+        val sizeState = remember(coffee) {
+            mutableStateOf(coffee.value!!.sizes[0])
+        }
         ModalBottomSheet(
             onDismissRequest = {
-                showBottomSheet.value = false
+                coffee.value = null
             },
             sheetState = sheetState,
             containerColor = Color.White,
         ) {
-            Column(modifier = Modifier.padding(horizontal = 30.dp)) {
+            Column(modifier = Modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -62,7 +61,7 @@ fun BottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     SubcomposeAsyncImage(
-                        model = coffeeSelected?.image,
+                        model = coffee.value?.image,
                         contentDescription = null,
                         modifier = Modifier
                             .size(56.dp)
@@ -82,16 +81,16 @@ fun BottomSheet(
                             .padding(horizontal = 10.dp)
                     ) {
                         Text(
-                            text = coffeeSelected?.name.toString(),
+                            text = coffee.value?.name.toString(),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
-                            text = coffeeSelected?.type.toString(),
+                            text = coffee.value?.type.toString(),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                     Text(
-                        text = coffeeSelected?.vote.toString(),
+                        text = coffee.value?.vote.toString(),
                         style = MaterialTheme.typography.labelLarge
                     )
                     Icon(
@@ -102,10 +101,24 @@ fun BottomSheet(
                 VerticalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp), color = Color.DarkGray
+                        .height(1.dp), color = Color.Gray
                 )
 
-                ListSizes(sizes = coffeeSelected.sizes, sizeState = sizeState)
+                ListSizes(sizes = coffee.value?.sizes!!, sizeDefault = sizeState.value.size){
+                    sizeState.value = it
+                }
+
+                VerticalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp), color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                MyElevatedButton(title = "Thêm vào giỏ hàng", onClick = {
+                    addToCart.invoke(coffee.value?.id.toString(), sizeState.value.size.toString())
+                    coffee.value = null
+                })
             }
         }
     }

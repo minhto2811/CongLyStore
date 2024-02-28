@@ -2,7 +2,6 @@ package com.mgok.conglystore.presentation.home.tabs.tab_fav
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,8 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,34 +34,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import com.mgok.conglystore.MainActivity
-import com.mgok.conglystore.Session.getUserSession
+import com.mgok.conglystore.component.BackgroundDelete
+import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.data.remote.coffee.Coffee
-import com.mgok.conglystore.presentation.coffee.CoffeeViewModel
-import com.mgok.conglystore.presentation.user.UserViewModel
 
 
 @Composable
 fun TabFavorite(
-    coffeeViewModel: CoffeeViewModel,
-    userViewModel: UserViewModel = hiltViewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel(),
     changePage: (String) -> Unit
 ) {
 
-    val state by coffeeViewModel.state.collectAsState()
+    val stateUI by favoriteViewModel.stateUI.collectAsState()
 
-    val favorites = remember { mutableStateListOf<Coffee>() }
 
     LaunchedEffect(Unit) {
-        if (getUserSession() != null) {
-            favorites.addAll(state.listCoffee.filter { getUserSession()?.favorites?.contains(it.id.toString()) == true })
-        }
+        favoriteViewModel.getFavorite()
     }
 
     LazyColumn(
@@ -74,23 +63,24 @@ fun TabFavorite(
             .padding(top = 20.dp),
     ) {
         items(
-            items = favorites,
+            items = stateUI.listCoffee,
             key = { it.id }
         ) { coffee ->
             CoffeeItem(coffee = coffee,
                 onRemove = {
-                    favorites -= coffee
-                    userViewModel.removeItemFavorite(coffee.id.toString())
+                    favoriteViewModel.deleteFavorite(coffee.id)
                 },
                 gotoDetail = {
-                    coffeeViewModel.setCoffeeSelected(coffee)
-                    changePage.invoke(MainActivity.Route.route_detail_coffe)
+                    changePage.invoke("detail_coffee/${coffee.id}")
                 })
-            VerticalDivider(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp), color = Color.Gray)
+            VerticalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp), color = Color.Gray
+            )
         }
     }
+    MyLoadingDialog(visible = stateUI.loading)
 }
 
 
@@ -117,7 +107,7 @@ fun CoffeeItem(
     )
     SwipeToDismissBox(
         state = state,
-        backgroundContent = { Background() },
+        backgroundContent = { BackgroundDelete() },
         enableDismissFromStartToEnd = false,
         modifier = Modifier
             .fillMaxWidth()
@@ -166,50 +156,5 @@ fun CoffeeItem(
 
 }
 
-@Composable
-@Preview
-fun Pre() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color.White)
-            .padding(vertical = 8.dp, horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(color = Color.Red)
-        ) {
 
-        }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text(text = "Cappucino", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Với socola")
-        }
-        Text(text = "2.8", style = MaterialTheme.typography.labelLarge)
-        Icon(
-            Icons.Filled.Star, contentDescription = "",
-            tint = Color(0xFFFBBE21)
-        )
-    }
-}
-
-@Composable
-fun Background() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Red)
-            .padding(end = 10.dp),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        Icon(Icons.Default.Delete, contentDescription = "", tint = Color.White)
-    }
-}
 

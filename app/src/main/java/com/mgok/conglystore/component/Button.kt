@@ -5,6 +5,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -12,14 +14,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 
@@ -41,7 +45,11 @@ fun TextButtonNormal(onClick: () -> Unit, title: String) {
 
 
 @Composable
-fun MyElevatedButton(title: String, onClick: () -> Unit, enable: State<Boolean>) {
+fun MyElevatedButton(
+    title: String,
+    onClick: () -> Unit,
+    enable: Boolean = true
+) {
     ElevatedButton(
         onClick = onClick,
         modifier = Modifier.size(width = 376.dp, height = 56.dp),
@@ -50,7 +58,7 @@ fun MyElevatedButton(title: String, onClick: () -> Unit, enable: State<Boolean>)
             disabledContainerColor = Color(0x66C67C4E)
         ),
         shape = RoundedCornerShape(12.dp),
-        enabled = enable.value,
+        enabled = enable,
         interactionSource = NoRippleInteractionSource()
     ) {
         Text(
@@ -91,6 +99,34 @@ fun MyOutlineButton(
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = Color(0xFF2A2A2A)
+        )
+    }
+}
+
+@Composable
+fun MyLabelButton(icon: ImageVector, title: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(0.dp),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 10.dp,
+            pressedElevation = 20.dp
+        ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFC67C4E)
+        ),
+    ) {
+        Icon(icon, "")
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp),
+            textAlign = TextAlign.Start
         )
     }
 }
