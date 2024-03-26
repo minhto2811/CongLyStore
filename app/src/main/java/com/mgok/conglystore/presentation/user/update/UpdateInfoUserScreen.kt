@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -114,6 +116,7 @@ fun UpdateInfoUserScreen(
         modifier = Modifier
             .fillMaxSize()
             .focusRequester(focusRequester)
+            .verticalScroll(rememberScrollState())
             .padding(28.dp)
     ) {
         Spacer(modifier = Modifier.height(32.dp))
@@ -230,6 +233,13 @@ fun UpdateInfoUserScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         RadioGroupGender(updateUserViewModel.gender)
+        Text(
+            text = "Vai trò",
+            style = MaterialTheme.typography.titleSmall,
+            color = Color(0xFF2A2A2A)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        RadioGroupRole(updateUserViewModel.role)
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -282,6 +292,32 @@ fun UpdateInfoUserScreen(
         }
 
         MyLoadingDialog(visible = stateUI.loading)
+    }
+}
+
+@Composable
+fun RadioGroupRole(role:MutableState<Int>) {
+    val radioOptions = listOf("Quản trị", "Người dùng")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        radioOptions.forEachIndexed { index, item ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = (role.value == index),
+                    onClick = { role.value = index },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color(0xFF648DDB)
+                    )
+                )
+                Text(
+                    text = item,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(end = 6.dp)
+                )
+            }
+        }
     }
 }
 

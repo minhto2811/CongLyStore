@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -111,8 +112,10 @@ fun TabCart(
                 }
             }
         }
-        items(stateUI.listCart.size) { index ->
-            val cart = stateUI.listCart[index]
+        items(
+            items = stateUI.listCart,
+            key = { it.id }
+        ) { cart ->
             CartItem(
                 cart = cart,
                 onRemove = {
@@ -260,7 +263,8 @@ fun CartItem(
                             onRemove()
                     }) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_remove), contentDescription = null,
+                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_remove),
+                        contentDescription = null,
                         tint = Color.White
                     )
                 }

@@ -3,16 +3,22 @@ package com.mgok.conglystore.presentation.address.list_address
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.sharp.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -33,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.component.MyLoadingDialog
@@ -43,7 +50,7 @@ import com.mgok.conglystore.data.remote.address.Address
 fun AddressScreen(
     addressViewModel: AddressViewModel = hiltViewModel(),
     onPop: () -> Unit,
-    changePage: (String) -> Unit
+    changePage: (String, String?) -> Unit,
 ) {
     val stateUI by addressViewModel.stateUI.collectAsState()
 
@@ -59,7 +66,12 @@ fun AddressScreen(
                 "Sổ địa chỉ",
                 onPop,
                 leading = {
-                    IconButton(onClick = { changePage.invoke(MainActivity.Route.route_new_address) }) {
+                    IconButton(onClick = {
+                        changePage.invoke(
+                            MainActivity.Route.route_new_address,
+                            null
+                        )
+                    }) {
                         Icon(Icons.Filled.AddCircle, null)
                     }
                 }
@@ -75,7 +87,60 @@ fun AddressScreen(
                 items = stateUI.listAddress,
                 key = { it.id }
             ) { address ->
-                AddressItem(address = address, changePage = changePage)
+                AddressItem(
+                    address = address,
+                    changePage = changePage,
+                    deleteDialog = {
+                        addressViewModel.addressIdDel = address.id
+                    }
+                )
+            }
+        }
+        if (addressViewModel.addressIdDel != null) {
+            Dialog(onDismissRequest = { addressViewModel.addressIdDel = null }) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color.White, shape = RoundedCornerShape(6.dp))
+                        .padding(26.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "Xác nhận xóa địa chỉ")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = { addressViewModel.addressIdDel = null },
+                            shape = RoundedCornerShape(4.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0x99A29A95)
+                            )
+                        ) {
+                            Text(
+                                text = "Quay lại",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                addressViewModel.deleteAddress(addressViewModel.addressIdDel!!)
+                                addressViewModel.addressIdDel = null
+                            },
+                            shape = RoundedCornerShape(4.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFC67C4E)
+                            )
+                        ) {
+                            Text(
+                                text = "Xác nhận",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+
+                        }
+                    }
+                }
             }
         }
     }
@@ -83,7 +148,11 @@ fun AddressScreen(
 
 
 @Composable
-fun AddressItem(address: Address, changePage: (String) -> Unit) {
+fun AddressItem(
+    address: Address,
+    changePage: (String, String?) -> Unit,
+    deleteDialog: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,11 +172,11 @@ fun AddressItem(address: Address, changePage: (String) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Nguyễn Văn Nam",
+                text = address.displayName,
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = "0321456987",
+                text = address.numberPhone,
                 style = MaterialTheme.typography.bodyMedium,
             )
             Box {
@@ -127,7 +196,10 @@ fun AddressItem(address: Address, changePage: (String) -> Unit) {
                         DropdownMenuItem(text = {
                             Text(text = it)
                         }, onClick = {
-                            changePage.invoke("")
+                            if (it == "Sửa") changePage.invoke(
+                                MainActivity.Route.route_new_address,
+                                address.id
+                            ) else deleteDialog()
                             expand = false
                         })
                     }
@@ -135,7 +207,7 @@ fun AddressItem(address: Address, changePage: (String) -> Unit) {
             }
         }
         Text(
-            text = "108 P. Nguyễn Hoàng, Mỹ Đình, Nam Từ Liêm, Hà Nội, Vietnam",
+            text = address.location,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)

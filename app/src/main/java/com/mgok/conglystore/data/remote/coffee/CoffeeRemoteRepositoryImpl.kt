@@ -18,8 +18,8 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
         return uploadTask.storage.downloadUrl.await()
     }
 
-    override suspend fun deleteImage(uri: Uri) {
-        storage.getReferenceFromUrl(uri.toString()).delete().await()
+    override suspend fun deleteImage(uri: String) {
+        storage.getReferenceFromUrl(uri).delete().await()
     }
 
     override suspend fun getListCoffee(): List<Coffee> {

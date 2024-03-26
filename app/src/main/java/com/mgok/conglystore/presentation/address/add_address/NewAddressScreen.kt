@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,10 +30,11 @@ import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyTextField
 import com.mgok.conglystore.component.TopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewAddressScreen(
     onPop: () -> Unit,
+    addressId: String?,
+    stringAddress: String?,
     changePage: (String) -> Unit,
     viewModel: NewAddressvViewModel = hiltViewModel()
 ) {
@@ -44,16 +44,31 @@ fun NewAddressScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.addressId = addressId
+    }
 
     LaunchedEffect(stateUI.message) {
         stateUI.message?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+    }
+
+    LaunchedEffect(stringAddress) {
+        stringAddress?.let {
+            viewModel.location.value = it
+        }
+    }
+
+    LaunchedEffect(addressId) {
+        addressId?.let {
+            viewModel.getAddressById(it)
+        }
     }
 
 
     MyLoadingDialog(visible = stateUI.loading)
     Scaffold(
         topBar = {
-            TopBar("Thêm địa chỉ", onPop)
+            TopBar(if (addressId == null) "Thêm địa chỉ" else "Cập nhật địa chỉ", onPop)
         }
     ) { paddingValues ->
         Column(
@@ -81,7 +96,8 @@ fun NewAddressScreen(
                 capitalization = KeyboardCapitalization.Words,
                 onValidate = {
                     //
-                }
+                },
+                maxChar = 40
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -103,7 +119,8 @@ fun NewAddressScreen(
                 capitalization = KeyboardCapitalization.Words,
                 onValidate = {
                     //
-                }
+                },
+                maxChar = 10
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -126,7 +143,7 @@ fun NewAddressScreen(
             Spacer(modifier = Modifier.height(26.dp))
 
             MyElevatedButton(
-                title = "Thêm địa chỉ",
+                title = if (addressId == null) "Thêm địa chỉ" else "Cập nhật địa chỉ",
                 onClick = { viewModel.upsertAddress() },
                 enable = viewModel.enableButton
             )

@@ -50,6 +50,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.mgok.conglystore.R
 import com.mgok.conglystore.component.ListSizes
 import com.mgok.conglystore.component.MyLoadingDialog
@@ -75,7 +78,7 @@ fun DetailProductScreen(
     if (stateUI.coffee != null) {
         Scaffold(
             bottomBar = {
-                BottomBar(stateUI.size) {
+                BottomBar(stateUI.size, stateUI.isAdding) {
                     detailCoffeeViewModel.addCart()
                 }
             }
@@ -263,7 +266,7 @@ fun DetailProductScreen(
 
 
 @Composable
-fun BottomBar(sizeState: Size?, addToCart: () -> Unit) {
+fun BottomBar(sizeState: Size?, isAdding: Boolean, addToCart: () -> Unit) {
     NavigationBar(
         tonalElevation = 10.dp,
         modifier = Modifier
@@ -282,7 +285,7 @@ fun BottomBar(sizeState: Size?, addToCart: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column (modifier = Modifier.width(100.dp)){
                 Text(
                     text = "Giá",
                     style = MaterialTheme.typography.labelSmall,
@@ -294,23 +297,33 @@ fun BottomBar(sizeState: Size?, addToCart: () -> Unit) {
                     color = Color(0xFFC67C4E),
                 )
             }
-            TextButton(
-                onClick = {
-                    addToCart.invoke()
-                },
-                modifier = Modifier
-                    .height(56.dp)
-                    .background(color = Color(0xFFC67C4E), shape = RoundedCornerShape(16.dp)),
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = Color(0xFFC67C4E),
-                    contentColor = Color(0xFFFFFFFF),
-                ),
-            ) {
-                Text(
-                    text = "Thêm vào giỏ hàng",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(horizontal = 10.dp)
+
+            if (isAdding) {
+                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.success_animation))
+                LottieAnimation(
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    composition = composition,
+                    contentScale = ContentScale.Inside,
                 )
+            } else {
+                TextButton(
+                    onClick = {
+                        addToCart.invoke()
+                    },
+                    modifier = Modifier
+                        .height(56.dp)
+                        .background(color = Color(0xFFC67C4E), shape = RoundedCornerShape(16.dp)),
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = Color(0xFFC67C4E),
+                        contentColor = Color(0xFFFFFFFF),
+                    ),
+                ) {
+                    Text(
+                        text = "Thêm vào giỏ hàng",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    )
+                }
             }
         }
     }

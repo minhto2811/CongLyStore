@@ -7,4 +7,5 @@ class GetFireBaseUserUseCase @Inject constructor(
     private val auth: FirebaseAuth
 ) {
     operator fun invoke() = auth.currentUser
+
 }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -59,6 +60,7 @@ class UpdateUserViewModel @Inject constructor(
     }
 
     val gender = mutableIntStateOf(0)
+    val role = mutableIntStateOf(0)
 
 
     var visibleDatePickerDialog by mutableStateOf(false)
@@ -81,7 +83,7 @@ class UpdateUserViewModel @Inject constructor(
             birthday = birthday,
             gender = gender.intValue,
             numberphone = numberphone.value,
-            role = 1
+            role = role.intValue
         )
     }
 
@@ -128,7 +130,7 @@ class UpdateUserViewModel @Inject constructor(
                 _stateUI.update { it.copy(loading = true) }
                 updateInfoUserUseCase.createInfoUser(newUser)
                 _stateUI.update { it.copy(loading = false) }
-                callback()
+                withContext(Dispatchers.Main) { callback() }
             } catch (e: Exception) {
                 _stateUI.update { it.copy(loading = false, error = e.message) }
             }

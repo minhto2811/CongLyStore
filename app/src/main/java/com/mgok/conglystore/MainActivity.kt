@@ -3,7 +3,6 @@ package com.mgok.conglystore
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,7 +23,6 @@ import com.mgok.conglystore.presentation.coffee.manager_product.NewCoffeeScreen
 import com.mgok.conglystore.presentation.coffee.search.SearchCoffeeScreen
 import com.mgok.conglystore.presentation.home.HomeScreen
 import com.mgok.conglystore.presentation.order.OrderScreen
-import com.mgok.conglystore.presentation.order.OrderViewModel
 import com.mgok.conglystore.presentation.splash.SplashScreen
 import com.mgok.conglystore.presentation.user.settings.SettingsScreen
 import com.mgok.conglystore.presentation.user.update.UpdateInfoUserScreen
@@ -33,10 +31,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val orderViewModel: OrderViewModel by viewModels()
-
-
     object Route {
         const val route_splash = "splash"
         const val route_auth = "auth"
@@ -107,7 +101,6 @@ class MainActivity : ComponentActivity() {
                                 changePage = { route ->
                                     navController.navigate(route)
                                 },
-                                orderViewModel = orderViewModel
                             )
                         }
 
@@ -124,12 +117,16 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Route.route_coffee_type) {
-                            CoffeeTypeScreen()
+                            CoffeeTypeScreen(onPop = {
+                                navController.popBackStack()
+                            })
                         }
 
                         //admin
                         composable(Route.route_coffee) {
-                            NewCoffeeScreen()
+                            NewCoffeeScreen(onPop = {
+                                navController.popBackStack()
+                            })
                         }
 
                         composable(
@@ -158,23 +155,33 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Route.rout_order) {
-                            OrderScreen(
-                                orderViewModel = orderViewModel
-                            )
+                            OrderScreen()
                         }
 
                         composable(Route.route_address) {
                             AddressScreen(
-                                changePage = {
-                                    navController.navigate(Route.route_new_address)
+                                changePage = { route, addressId ->
+                                    val direct =
+                                        if (addressId == null) route else "$route?addressId=$addressId"
+                                    navController.navigate(direct)
                                 },
                                 onPop = {
                                     navController.popBackStack()
                                 })
                         }
 
-                        composable(Route.route_new_address) {
+                        composable(
+                            "${Route.route_new_address}?addressId={addressId}",
+                            arguments = listOf(navArgument("addressId") {
+                                type = NavType.StringType
+                                nullable = true
+                            })
+                        ) { entry ->
+                            val stringAddress = entry.savedStateHandle.get<String>("address")
+                            val addressId = entry.arguments?.getString("addressId")
                             NewAddressScreen(
+                                stringAddress = stringAddress,
+                                addressId = addressId,
                                 onPop = {
                                     navController.popBackStack()
                                 },
@@ -185,7 +192,13 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Route.route_map) {
-                            MapScreen(onPop = { /*TODO*/ })
+                            MapScreen(onPop = { stringAddress ->
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("address", stringAddress)
+                                navController.popBackStack()
+                            }
+                            )
                         }
                     }
 

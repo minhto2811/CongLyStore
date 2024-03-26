@@ -1,5 +1,6 @@
 package com.mgok.conglystore.component
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,8 +34,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.mgok.conglystore.R
 import com.mgok.conglystore.data.remote.coffee.Coffee
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
@@ -45,6 +52,7 @@ fun BottomSheet(
         val sizeState = remember(coffee) {
             mutableStateOf(coffee.value!!.sizes[0])
         }
+        val anim = mutableStateOf(false)
         ModalBottomSheet(
             onDismissRequest = {
                 coffee.value = null
@@ -104,7 +112,7 @@ fun BottomSheet(
                         .height(1.dp), color = Color.Gray
                 )
 
-                ListSizes(sizes = coffee.value?.sizes!!, sizeDefault = sizeState.value.size){
+                ListSizes(sizes = coffee.value?.sizes!!, sizeDefault = sizeState.value.size) {
                     sizeState.value = it
                 }
 
@@ -115,10 +123,20 @@ fun BottomSheet(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
 
-                MyElevatedButton(title = "Thêm vào giỏ hàng", onClick = {
-                    addToCart.invoke(coffee.value?.id.toString(), sizeState.value.size.toString())
-                    coffee.value = null
-                })
+                if (anim.value) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.success_animation))
+                    LottieAnimation(
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                        composition = composition,
+                        contentScale = ContentScale.FillHeight,
+                    )
+                } else {
+                    MyElevatedButton(title = "Thêm vào giỏ hàng", onClick = {
+                        anim.value = true
+                        addToCart.invoke(coffee.value?.id.toString(), sizeState.value.size)
+                    })
+                }
             }
         }
     }

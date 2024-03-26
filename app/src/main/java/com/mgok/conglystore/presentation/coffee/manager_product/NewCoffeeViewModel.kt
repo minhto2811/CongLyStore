@@ -1,9 +1,15 @@
 package com.mgok.conglystore.presentation.coffee.manager_product
 
 import android.net.Uri
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.data.remote.coffee.Coffee
+import com.mgok.conglystore.data.remote.coffee.Size
 import com.mgok.conglystore.usecases.coffee.InsertCoffeeUseCase
 import com.mgok.conglystore.usecases.coffee_type.GetListCoffeeTypeUseCase
 import com.mgok.conglystore.usecases.image.DeleteImageUseCase
@@ -28,26 +34,73 @@ class NewCoffeeViewModel @Inject constructor(
     val stateUI = _stateUI.asStateFlow()
 
 
+    var nameCoffee = mutableStateOf("")
+    val typeCoffee = mutableStateOf("")
+    var imageCoffee by mutableStateOf<String?>(null)
+    val sizes = mutableStateListOf<Size>()
+
+    val showDialog = mutableStateOf(false)
+
+    val size = mutableStateOf("")
+    val price = mutableStateOf("")
+
+    val coffee by derivedStateOf {
+        mutableStateOf(
+            Coffee(
+                name = nameCoffee.value,
+                type = typeCoffee.value,
+                image = imageCoffee,
+                sizes = sizes
+            )
+        )
+    }
+
+    val enableButton by derivedStateOf {
+        mutableStateOf(
+            nameCoffee.value.isNotEmpty()
+                    && typeCoffee.value.isNotEmpty()
+                    && !imageCoffee.isNullOrEmpty()
+                    && sizes.isNotEmpty()
+        )
+    }
+
 
     init {
         getListCoffeeType()
     }
 
-    fun deleteImage(uri: Uri) {
+    fun addSize() {
+        try {
+            val newSize = Size(
+                size = size.value,
+                price = price.value.toFloat()
+            )
+            sizes.add(newSize)
+            size.value = ""
+            price.value = ""
+        } catch (e: NumberFormatException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun deleteImage() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                deleteImageUseCase.deleteImage(uri)
+                deleteImageUseCase.deleteImage(imageCoffee.toString())
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    fun insertCoffee(coffee: Coffee) {
+    fun insertCoffee() {
         viewModelScope.launch(Dispatchers.IO) {
             _stateUI.update { it.copy(loading = true) }
             try {
-                insertCoffeeUseCase.insertCoffee(coffee)
+                insertCoffeeUseCase.insertCoffee(coffee.value)
+                typeCoffee.value = ""
+                imageCoffee = null
+                sizes.clear()
             } catch (e: Exception) {
                 e.printStackTrace()
                 _stateUI.update { it.copy(error = e.message) }
