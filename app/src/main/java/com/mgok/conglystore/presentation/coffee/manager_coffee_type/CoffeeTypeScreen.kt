@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,12 +26,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyTextField
+import com.mgok.conglystore.component.TopBar
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CoffeeTypeScreen(
-    coffeeTypeViewModel: CoffeeTypeViewModel = hiltViewModel()
+    coffeeTypeViewModel: CoffeeTypeViewModel = hiltViewModel(),
+    onPop:()->Unit
 ) {
 
     val stateUI by coffeeTypeViewModel.stateUI.collectAsState()
@@ -40,57 +43,62 @@ fun CoffeeTypeScreen(
 
 
 
-
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .focusRequester(focusRequester)
-            .padding(top = 100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            MyTextField(
-                state = coffeeTypeViewModel.name, hint = "Nhập tên loại cà phê",
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
-                    }
-                ),
-                capitalization = KeyboardCapitalization.Words,
-                hasSpace = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            MyElevatedButton(
-                title = "Thêm mới",
-                onClick = {
-                    coffeeTypeViewModel.insertCoffeeType()
-                    focusManager.clearFocus()
-                }, enable = coffeeTypeViewModel.enableButton
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
+    Scaffold(
+        topBar = {
+            TopBar("Thêm loại cà phê", onPop)
         }
-        items(stateUI.listCoffeeType.size) {
-            val item = stateUI.listCoffeeType[it]
-            Text(
-                text = item.name,
-                modifier = Modifier
-                    .size(width = 376.dp, height = 56.dp)
-                    .padding(vertical = 16.dp)
-                    .combinedClickable(
-                        indication = null,
-                        interactionSource = NoRippleInteractionSource(),
-                        onLongClick = {
-                            coffeeTypeViewModel.deleteCoffeeType(item)
-                        },
-                        onClick = {
+    ) { paddingValues ->
 
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(focusRequester)
+                .padding(top = paddingValues.calculateTopPadding()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                MyTextField(
+                    state = coffeeTypeViewModel.name, hint = "Nhập tên loại cà phê",
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
                         }
-                    )
-            )
+                    ),
+                    capitalization = KeyboardCapitalization.Words,
+                    hasSpace = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                MyElevatedButton(
+                    title = "Thêm mới",
+                    onClick = {
+                        coffeeTypeViewModel.insertCoffeeType()
+                        focusManager.clearFocus()
+                    }, enable = coffeeTypeViewModel.enableButton
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+            }
+            items(stateUI.listCoffeeType.size) {
+                val item = stateUI.listCoffeeType[it]
+                Text(
+                    text = item.name,
+                    modifier = Modifier
+                        .size(width = 376.dp, height = 56.dp)
+                        .padding(vertical = 16.dp)
+                        .combinedClickable(
+                            indication = null,
+                            interactionSource = NoRippleInteractionSource(),
+                            onLongClick = {
+                                coffeeTypeViewModel.deleteCoffeeType(item)
+                            },
+                            onClick = {
+
+                            }
+                        )
+                )
+            }
         }
     }
 

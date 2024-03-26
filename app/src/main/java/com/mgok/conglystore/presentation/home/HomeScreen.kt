@@ -49,7 +49,6 @@ import com.mgok.conglystore.presentation.home.tabs.tab_cart.TabCart
 import com.mgok.conglystore.presentation.home.tabs.tab_fav.TabFavorite
 import com.mgok.conglystore.presentation.home.tabs.tab_home.TabHome
 import com.mgok.conglystore.presentation.home.tabs.tab_notify.TabNotify
-import com.mgok.conglystore.presentation.order.OrderViewModel
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -58,7 +57,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     changePage: (String) -> Unit,
-    orderViewModel: OrderViewModel
 ) {
     val coroutine = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { BottomNavigationItem.itemsBottom.size })
@@ -133,7 +131,6 @@ fun HomeScreen(
                 paddingValue = paddingValue,
                 changePage = changePage,
                 drawerState = drawerState,
-                orderViewModel = orderViewModel
             )
         }
     }
@@ -191,7 +188,6 @@ fun TabsContent(
     paddingValue: PaddingValues,
     changePage: (String) -> Unit,
     drawerState: DrawerState,
-    orderViewModel: OrderViewModel
 ) {
     HorizontalPager(
         userScrollEnabled = false,

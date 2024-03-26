@@ -1,5 +1,8 @@
 package com.mgok.conglystore.presentation.address.list_address
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.usecases.address.DeleteAddressUseCase
@@ -20,6 +23,8 @@ class AddressViewModel @Inject constructor(
 
     private val _stateUI = MutableStateFlow(AddressStateUI())
     val stateUI = _stateUI.asStateFlow()
+
+    var addressIdDel by mutableStateOf<String?>(null)
     fun getListAddress() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -39,6 +44,8 @@ class AddressViewModel @Inject constructor(
             try {
                 _stateUI.update { it.copy(loading = true) }
                 deleteAddressUseCase.deleteAddress(addressId)
+                val newList = _stateUI.value.listAddress.filter { it -> it.id != addressId }
+                _stateUI.update { it.copy(listAddress = newList) }
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

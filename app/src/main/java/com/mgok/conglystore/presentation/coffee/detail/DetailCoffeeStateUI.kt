@@ -8,4 +8,5 @@ data class DetailCoffeeStateUI(
     val loading: Boolean = false,
     val isFavorite: Boolean = false,
     val size: Size? = null,
+    val isAdding:Boolean = false
 )

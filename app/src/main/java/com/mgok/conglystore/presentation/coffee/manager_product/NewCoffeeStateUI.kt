@@ -7,5 +7,5 @@ data class NewCoffeeStateUI(
     val loading: Boolean = false,
     val listCoffeeType: List<CoffeeType> = listOf(),
     val url: Uri? = null,
-    val error: String? = null
+    val error: String? = null,
 )

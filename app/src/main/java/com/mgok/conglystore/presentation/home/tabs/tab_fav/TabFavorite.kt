@@ -25,7 +25,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,11 +35,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.mgok.conglystore.component.BackgroundDelete
-import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.data.remote.coffee.Coffee
 
 
@@ -50,7 +49,7 @@ fun TabFavorite(
     changePage: (String) -> Unit
 ) {
 
-    val stateUI by favoriteViewModel.stateUI.collectAsState()
+    val stateUI by favoriteViewModel.stateUI.collectAsStateWithLifecycle()
 
 
     LaunchedEffect(Unit) {
@@ -80,7 +79,6 @@ fun TabFavorite(
             )
         }
     }
-    MyLoadingDialog(visible = stateUI.loading)
 }
 
 

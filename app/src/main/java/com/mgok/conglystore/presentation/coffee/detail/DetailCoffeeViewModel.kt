@@ -1,6 +1,5 @@
 package com.mgok.conglystore.presentation.coffee.detail
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.data.remote.cart.Cart
@@ -12,6 +11,7 @@ import com.mgok.conglystore.usecases.favorite.DeteleFavoriteUseCase
 import com.mgok.conglystore.usecases.favorite.GetListFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -80,6 +80,7 @@ class DetailCoffeeViewModel @Inject constructor(
 
     fun addCart() {
         viewModelScope.launch(Dispatchers.IO) {
+            _stateUI.update { it.copy(isAdding = true) }
             try {
                 val cart = Cart(
                     idCoffee = _stateUI.value.coffee?.id.toString(),
@@ -87,7 +88,10 @@ class DetailCoffeeViewModel @Inject constructor(
                 )
                 upsertCartUseCase.upsertCart(cart)
             } catch (e: Exception) {
-                Log.e("ghg insert: ", e.toString())
+                e.printStackTrace()
+            }finally {
+                delay(1300)
+                _stateUI.update { it.copy(isAdding = false) }
             }
         }
     }

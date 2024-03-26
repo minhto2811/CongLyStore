@@ -1,6 +1,5 @@
 package com.mgok.conglystore.presentation.home.tabs.tab_home
 
-import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +13,7 @@ import com.mgok.conglystore.usecases.map.GetLocationCurrentUseCase
 import com.mgok.conglystore.usecases.user.GetInfoUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,7 +56,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val location = getLocationCurrentUseCase.getLocationCurrent()
-                val line = getLocationByLatlngUseCase.getLocation(LatLng(location.latitude,location.longitude))
+                val line = getLocationByLatlngUseCase.getLocation(
+                    LatLng(
+                        location.latitude,
+                        location.longitude
+                    )
+                )
                 _stateUI.update { it.copy(location = line) }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -91,13 +96,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun addCart(cart: Cart) {
+    fun addCart(cart: Cart, callback: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (getInfoUserUseCase() == null) return@launch
                 upsertCartUseCase.upsertCart(cart)
             } catch (e: Exception) {
-                Log.e("ghg insert: ", e.toString())
+               e.printStackTrace()
+            } finally {
+                delay(1000)
+                callback.invoke()
             }
         }
     }

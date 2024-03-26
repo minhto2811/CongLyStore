@@ -10,5 +10,5 @@ interface CoffeeRemoteRepository {
     suspend fun getListCoffeeByName(coffeeName: String): List<Coffee>
     suspend fun uploadImage(uri: Uri, uid: String): Uri
 
-    suspend fun deleteImage(uri: Uri)
+    suspend fun deleteImage(uri: String)
 }

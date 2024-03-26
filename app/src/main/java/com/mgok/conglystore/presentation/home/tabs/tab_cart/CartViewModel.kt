@@ -1,6 +1,5 @@
 package com.mgok.conglystore.presentation.home.tabs.tab_cart
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.data.remote.cart.Cart
@@ -47,9 +46,7 @@ class CartViewModel @Inject constructor(
                 val data = derferred.awaitAll().filter { it.coffee != null }
                 _stateUI.update {
                     it.copy(
-                        listCart = data,
-                        totalPrice = getTotalPrice(data),
-                        loading = false
+                        listCart = data, totalPrice = getTotalPrice(data), loading = false
                     )
                 }
             } catch (e: Exception) {
@@ -100,12 +97,7 @@ class CartViewModel @Inject constructor(
                 _stateUI.update { it.copy(loading = true) }
                 deleteCartUseCase.delete(cartId)
                 val newListCart = _stateUI.value.listCart.toMutableList()
-                newListCart.forEachIndexed { index, item ->
-                    if (item.id == cartId) {
-                        newListCart.removeAt(index)
-                        return@forEachIndexed
-                    }
-                }
+                newListCart.removeIf { it.id == cartId }
                 _stateUI.update {
                     it.copy(
                         listCart = newListCart,
@@ -114,7 +106,7 @@ class CartViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Log.e("ghg delete: ", e.toString())
+                e.printStackTrace()
                 _stateUI.update { it.copy(loading = false) }
             }
         }

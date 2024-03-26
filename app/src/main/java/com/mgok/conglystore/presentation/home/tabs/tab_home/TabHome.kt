@@ -312,7 +312,9 @@ fun TabHome(
         coffee = coffeeSelected, sheetState = sheetState
     ) { id, size ->
         val cart = Cart(idCoffee = id, size = size)
-        homeViewModel.addCart(cart)
+        homeViewModel.addCart(cart){
+            coffeeSelected.value = null
+        }
     }
 
 
