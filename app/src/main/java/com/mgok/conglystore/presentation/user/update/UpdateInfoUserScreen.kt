@@ -101,8 +101,8 @@ fun UpdateInfoUserScreen(
     )
 
 
-    LaunchedEffect(stateUI.error) {
-        stateUI.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+    LaunchedEffect(stateUI.url) {
+        stateUI.url?.let { updateUserViewModel.avatar = it}
     }
 
 

@@ -66,6 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
+    addressDefault: String?,
     onPop: (String?) -> Unit,
     mapsViewModel: MapsViewModel = hiltViewModel()
 ) {
@@ -73,6 +74,15 @@ fun MapScreen(
     val context = LocalContext.current
     LaunchedEffect(stateUI.error) {
         stateUI.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+    }
+
+    LaunchedEffect(Unit) {
+        if (addressDefault != null) {
+            mapsViewModel.searchText = addressDefault
+            mapsViewModel.getListLocationByName()
+        } else {
+            mapsViewModel.getLocation()
+        }
     }
 
     val cameraPositionState = rememberCameraPositionState()

@@ -35,7 +35,7 @@ fun NewAddressScreen(
     onPop: () -> Unit,
     addressId: String?,
     stringAddress: String?,
-    changePage: (String) -> Unit,
+    changePage: (String,String?) -> Unit,
     viewModel: NewAddressvViewModel = hiltViewModel()
 ) {
     val stateUI by viewModel.stateUI.collectAsStateWithLifecycle()
@@ -43,10 +43,6 @@ fun NewAddressScreen(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        viewModel.addressId = addressId
-    }
 
     LaunchedEffect(stateUI.message) {
         stateUI.message?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
@@ -58,9 +54,10 @@ fun NewAddressScreen(
         }
     }
 
-    LaunchedEffect(addressId) {
-        addressId?.let {
-            viewModel.getAddressById(it)
+    LaunchedEffect(Unit) {
+        if (stringAddress == null && addressId != null){
+            viewModel.addressId = addressId
+            viewModel.getAddressById()
         }
     }
 
@@ -136,7 +133,8 @@ fun NewAddressScreen(
                 capitalization = KeyboardCapitalization.Words,
                 enableb = false,
                 onClickable = {
-                    changePage.invoke(MainActivity.Route.route_map)
+                    val params = if (addressId == null) null else viewModel.location.value
+                    changePage.invoke(MainActivity.Route.route_map,params)
                 }
             )
 

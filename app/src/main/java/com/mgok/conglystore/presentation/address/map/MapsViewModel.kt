@@ -38,9 +38,6 @@ class MapsViewModel @Inject constructor(
         _stateUI.update { it.copy(list = listOf()) }
     }
 
-    init {
-        getLocation()
-    }
 
     fun getLocation() {
         viewModelScope.launch(Dispatchers.IO) {

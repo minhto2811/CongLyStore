@@ -72,11 +72,11 @@ class NewAddressvViewModel @Inject constructor(
         }
     }
 
-    fun getAddressById(addressId: String) {
+    fun getAddressById() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _stateUI.update { it.copy(loading = true) }
-                val address = getAddressUseCase.getAddress(addressId)
+                val address = getAddressUseCase.getAddress(addressId.toString())
                 address?.let { add ->
                     displayName.value = add.displayName
                     numberPhone.value = add.numberPhone
