@@ -185,19 +185,31 @@ class MainActivity : ComponentActivity() {
                                 onPop = {
                                     navController.popBackStack()
                                 },
-                                changePage = { route ->
-                                    navController.navigate(route)
+                                changePage = { route, stringAddress ->
+                                    val direct =
+                                        if (stringAddress == null) route else "$route?stringAddress=$stringAddress"
+                                    navController.navigate(direct)
                                 }
                             )
                         }
 
-                        composable(Route.route_map) {
-                            MapScreen(onPop = { stringAddress ->
-                                navController.previousBackStackEntry
-                                    ?.savedStateHandle
-                                    ?.set("address", stringAddress)
-                                navController.popBackStack()
-                            }
+                        composable(
+                            "${Route.route_map}?stringAddress={stringAddress}",
+                            arguments = listOf(navArgument("stringAddress") {
+                                type = NavType.StringType
+                                nullable = true
+                            })
+                        ) { backStackEntry ->
+                            val addressDefault =
+                                backStackEntry.arguments?.getString("stringAddress")
+                            MapScreen(
+                                addressDefault = addressDefault,
+                                onPop = { stringAddress ->
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("address", stringAddress)
+                                    navController.popBackStack()
+                                }
                             )
                         }
                     }
