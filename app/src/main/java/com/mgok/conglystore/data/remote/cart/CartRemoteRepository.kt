@@ -7,4 +7,6 @@ interface CartRemoteRepository {
     suspend fun upsertCart(cart: Cart)
 
     suspend fun delete(cartId: String)
+
+    suspend fun deleteAll()
 }

@@ -71,6 +71,11 @@ class NewCoffeeViewModel @Inject constructor(
 
     fun addSize() {
         try {
+            val count = sizes.indexOfFirst { it.size == size.value.trim() }
+            if (count > -1){
+                _stateUI.update { it.copy(error = "Kích thước đã tồn tại") }
+                return
+            }
             val newSize = Size(
                 size = size.value,
                 price = price.value.toFloat()
@@ -136,5 +141,9 @@ class NewCoffeeViewModel @Inject constructor(
                 _stateUI.update { it.copy(loading = false) }
             }
         }
+    }
+
+    fun deleteItemSize(size: String) {
+        sizes.removeIf { it.size == size }
     }
 }

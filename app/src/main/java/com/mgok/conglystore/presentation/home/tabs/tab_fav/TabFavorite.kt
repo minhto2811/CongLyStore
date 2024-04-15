@@ -2,6 +2,7 @@ package com.mgok.conglystore.presentation.home.tabs.tab_fav
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +40,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.mgok.conglystore.R
 import com.mgok.conglystore.component.BackgroundDelete
+import com.mgok.conglystore.component.LotifiesCompose
 import com.mgok.conglystore.data.remote.coffee.Coffee
 
 
@@ -56,27 +59,40 @@ fun TabFavorite(
         favoriteViewModel.getFavorite()
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 20.dp),
-    ) {
-        items(
-            items = stateUI.listCoffee,
-            key = { it.id }
-        ) { coffee ->
-            CoffeeItem(coffee = coffee,
-                onRemove = {
-                    favoriteViewModel.deleteFavorite(coffee.id)
-                },
-                gotoDetail = {
-                    changePage.invoke("detail_coffee/${coffee.id}")
-                })
-            VerticalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp), color = Color.Gray
+    if (stateUI.listCoffee.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LotifiesCompose(
+                resourceId = R.raw.favourite_animation,
+                modifier = Modifier.size(250.dp)
             )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp),
+        ) {
+            items(
+                items = stateUI.listCoffee,
+                key = { it.id }
+            ) { coffee ->
+                CoffeeItem(coffee = coffee,
+                    onRemove = {
+                        favoriteViewModel.deleteFavorite(coffee.id)
+                    },
+                    gotoDetail = {
+                        changePage.invoke("detail_coffee/${coffee.id}")
+                    })
+                VerticalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp), color = Color.Gray
+                )
+            }
         }
     }
 }

@@ -123,7 +123,6 @@ fun HomeScreen(
             bottomBar = {
                 BottomBar(pagerState, coroutine)
             },
-
             containerColor = Color(0x97E4DEDE),
         ) { paddingValue ->
             TabsContent(

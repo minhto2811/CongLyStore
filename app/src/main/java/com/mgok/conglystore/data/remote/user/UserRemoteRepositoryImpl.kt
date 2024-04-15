@@ -28,7 +28,7 @@ class UserRemoteRepositoryImpl @Inject constructor(
 
     override suspend fun getInfoUser(): User? {
         return try {
-            val snapshot = firestore.collection("users").document(auth.uid.toString()).get().await()
+            val snapshot = firestore.collection("users").document(auth.currentUser!!.uid).get().await()
             Log.e("getInfoUser: ", snapshot.toObject(User::class.java).toString())
             snapshot.toObject(User::class.java)
         } catch (e: Exception) {
@@ -85,14 +85,14 @@ class UserRemoteRepositoryImpl @Inject constructor(
         if (!response.isSuccessful || response.body == null) throw Exception()
         val imageData = response.body!!.bytes()
         val avatarRef = storage.reference
-            .child("avatars/${auth.uid}.png")
+            .child("avatars/${auth.currentUser!!.uid}.png")
         val uploadTask = avatarRef.putBytes(imageData).await()
         return uploadTask.storage.downloadUrl.await()
     }
 
     override suspend fun updateAvatar(uri: Uri): Uri {
         val avatarRef = storage.reference
-            .child("avatars/${auth.uid}.png")
+            .child("avatars/${auth.currentUser!!.uid}.png")
         val uploadTask = avatarRef.putFile(uri).await()
         return uploadTask.storage.downloadUrl.await()
     }

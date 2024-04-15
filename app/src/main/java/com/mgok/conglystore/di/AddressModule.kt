@@ -6,6 +6,7 @@ import com.mgok.conglystore.data.remote.address.AddressRemoteRepository
 import com.mgok.conglystore.data.remote.address.AddressRemoteRepositoryImpl
 import com.mgok.conglystore.usecases.address.DeleteAddressUseCase
 import com.mgok.conglystore.usecases.address.GetAddressUseCase
+import com.mgok.conglystore.usecases.address.GetFistAddressUseCase
 import com.mgok.conglystore.usecases.address.GetListAddressUseCase
 import com.mgok.conglystore.usecases.address.UpsertAddressUseCase
 import dagger.Module
@@ -27,6 +28,7 @@ object AddressModule {
     ): AddressRemoteRepository {
         return AddressRemoteRepositoryImpl(auth, firestore)
     }
+
 
     @Provides
     @Singleton
@@ -50,6 +52,11 @@ object AddressModule {
     @Singleton
     fun providesDeleteAddressUseCase(addressRemoteRepository: AddressRemoteRepository): DeleteAddressUseCase {
         return DeleteAddressUseCase(addressRemoteRepository)
+    }
+    @Provides
+    @Singleton
+    fun providesGetFistAddressUseCase(addressRemoteRepository: AddressRemoteRepository): GetFistAddressUseCase {
+        return GetFistAddressUseCase(addressRemoteRepository)
     }
 
 }
