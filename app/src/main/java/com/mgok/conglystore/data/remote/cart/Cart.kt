@@ -5,10 +5,9 @@ import java.util.UUID
 
 data class Cart(
     val id: String = UUID.randomUUID().toString(),
-    val userId: String =  "",
+    val userId: String = "",
     val idCoffee: String = "",
     var quantity: Int = 1,
     var size: String = "",
     var coffee: Coffee? = null
 )
-

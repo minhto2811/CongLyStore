@@ -68,7 +68,7 @@ import com.mgok.conglystore.component.TopBar
 @Composable
 fun NewCoffeeScreen(
     newCoffeeViewModel: NewCoffeeViewModel = hiltViewModel(),
-    onPop:()->Unit
+    onPop: () -> Unit
 ) {
     val stateUI by newCoffeeViewModel.stateUI.collectAsState()
 
@@ -88,6 +88,10 @@ fun NewCoffeeScreen(
         if (stateUI.listCoffeeType.isNotEmpty()) {
             newCoffeeViewModel.nameCoffee.value = stateUI.listCoffeeType[0].name
         }
+    }
+
+    LaunchedEffect(stateUI.error) {
+        stateUI.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
     }
 
 
@@ -210,7 +214,7 @@ fun NewCoffeeScreen(
                                         .show()
                                 },
                                 onLongClick = {
-
+                                    newCoffeeViewModel.deleteItemSize(item.size)
                                 }
                             ),
                         contentAlignment = Alignment.Center

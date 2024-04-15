@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -31,14 +32,9 @@ fun MyLoadingDialog(
         Dialog(onDismissRequest = {}) {
             Card(
                 modifier = Modifier
-                    .size(120.dp)
+                    .wrapContentSize()
             ) {
-                val composition =
-                    rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation)).value
-                LottieAnimation(
-                    composition = composition,
-                    iterations = Int.MAX_VALUE
-                )
+                LotifiesCompose(resourceId = R.raw.loading_animation, modifier = Modifier.size(140.dp))
             }
         }
     }

@@ -11,8 +11,14 @@ class AddressRemoteRepositoryImpl @Inject constructor(
 ) : AddressRemoteRepository {
     override suspend fun getListAddress(): List<Address> {
         val snapshot =
-            firestore.collection("address").whereEqualTo("userId", auth.uid).get().await()
+            firestore.collection("address").whereEqualTo("userId", auth.currentUser!!.uid).get().await()
         return snapshot.toObjects(Address::class.java)
+    }
+
+    override suspend fun getFirstAddress(): Address {
+        val snapshot =
+            firestore.collection("address").limit(1L).get().await()
+        return snapshot.toObjects(Address::class.java)[0]
     }
 
     override suspend fun getAddress(addressId: String): Address? {
@@ -22,7 +28,7 @@ class AddressRemoteRepositoryImpl @Inject constructor(
 
     override suspend fun upsertAddress(address: Address) {
         firestore.collection("address").document(address.id)
-            .set(address.copy(userId = auth.uid.toString()))
+            .set(address.copy(userId = auth.currentUser!!.uid))
             .await()
     }
 

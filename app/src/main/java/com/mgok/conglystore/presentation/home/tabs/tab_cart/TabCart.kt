@@ -56,6 +56,7 @@ import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
 import com.mgok.conglystore.component.BackgroundDelete
 import com.mgok.conglystore.component.ListSizes
+import com.mgok.conglystore.component.LotifiesCompose
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.data.remote.cart.Cart
 import com.mgok.conglystore.data.remote.coffee.Size
@@ -74,69 +75,83 @@ fun TabCart(
 
     MyLoadingDialog(visible = stateUI.loading)
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 20.dp),
-    ) {
-        item {
 
-            AnimatedVisibility(
-                visible = stateUI.totalPrice > 0f,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .height(100.dp)
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 30.dp, bottom = 2.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+    if (stateUI.listCart.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LotifiesCompose(
+                resourceId = R.raw.cart_animation,
+                modifier = Modifier.size(250.dp)
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp),
+        ) {
+            item {
+
+                AnimatedVisibility(
+                    visible = stateUI.totalPrice > 0f,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut(),
                 ) {
-                    Text(text = "\$${stateUI.totalPrice}")
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(color = Color(0xFFC67C4E))
-                            .clickable {
-                                changePage.invoke(MainActivity.Route.rout_order)
-                            }
-                            .padding(horizontal = 20.dp, vertical = 10.dp)
+                            .height(100.dp)
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, end = 20.dp, top = 30.dp, bottom = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Xác nhận",
-                            color = Color.White
-                        )
+                        Text(text = "\$${stateUI.totalPrice}")
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(color = Color(0xFFC67C4E))
+                                .clickable {
+                                    changePage.invoke(MainActivity.Route.rout_order)
+                                }
+                                .padding(horizontal = 20.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = "Xác nhận",
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
-        }
-        items(
-            items = stateUI.listCart,
-            key = { it.id }
-        ) { cart ->
-            CartItem(
-                cart = cart,
-                onRemove = {
-                    cartViewModel.deleteCart(cart.id)
-                },
-                gotoDetail = {
-                    changePage.invoke("detail_coffee/${cart.idCoffee}")
-                },
-                onUpdate = { quan, sizeNew ->
-                    with(cart) {
-                        quantity = quan
-                        size = sizeNew
-                    }
-                    cartViewModel.upsertCart(cart)
-                },
-            )
+            items(
+                items = stateUI.listCart,
+                key = { it.id }
+            ) { cart ->
+                CartItem(
+                    cart = cart,
+                    onRemove = {
+                        cartViewModel.deleteCart(cart.id)
+                    },
+                    gotoDetail = {
+                        changePage.invoke("detail_coffee/${cart.idCoffee}")
+                    },
+                    onUpdate = { quan, sizeNew ->
+                        with(cart) {
+                            quantity = quan
+                            size = sizeNew
+                        }
+                        cartViewModel.upsertCart(cart)
+                    },
+                )
 
-            VerticalDivider(
-                modifier = Modifier.height(1.dp),
-                color = Color.Gray
-            )
+                VerticalDivider(
+                    modifier = Modifier.height(1.dp),
+                    color = Color.Gray
+                )
+            }
         }
     }
 }

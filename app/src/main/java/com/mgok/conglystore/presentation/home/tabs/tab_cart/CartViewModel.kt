@@ -3,7 +3,7 @@ package com.mgok.conglystore.presentation.home.tabs.tab_cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.data.remote.cart.Cart
-import com.mgok.conglystore.usecases.cart.DeleteCartUseCase
+import com.mgok.conglystore.usecases.cart.DeleteCartByIdUseCase
 import com.mgok.conglystore.usecases.cart.GetListCartUseCase
 import com.mgok.conglystore.usecases.cart.UpsertCartUseCase
 import com.mgok.conglystore.usecases.coffee.GetCoffeeByIdUseCase
@@ -22,7 +22,7 @@ class CartViewModel @Inject constructor(
     private val upsertCartUseCase: UpsertCartUseCase,
     private val getListCartUseCase: GetListCartUseCase,
     private val getCoffeeByIdUseCase: GetCoffeeByIdUseCase,
-    private val deleteCartUseCase: DeleteCartUseCase,
+    private val deleteCartByIdUseCase: DeleteCartByIdUseCase,
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(CartStateUI())
     val stateUI = _stateUI.asStateFlow()
@@ -95,7 +95,7 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _stateUI.update { it.copy(loading = true) }
-                deleteCartUseCase.delete(cartId)
+                deleteCartByIdUseCase.delete(cartId)
                 val newListCart = _stateUI.value.listCart.toMutableList()
                 newListCart.removeIf { it.id == cartId }
                 _stateUI.update {

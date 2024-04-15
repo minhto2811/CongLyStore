@@ -12,7 +12,7 @@ class FavoriteRemoteRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : FavoriteRemoteRepository {
     override suspend fun getListFavourite(): List<String>? {
-        val snapshot = firestore.collection("favorites").document(auth.uid.toString()).get().await()
+        val snapshot = firestore.collection("favorites").document(auth.currentUser!!.uid).get().await()
         return snapshot.toObject(Favorite::class.java)?.favorites
     }
 
@@ -21,7 +21,7 @@ class FavoriteRemoteRepositoryImpl @Inject constructor(
         val map = mapOf(
             "favorites" to FieldValue.arrayUnion(coffeeId)
         )
-        firestore.collection("favorites").document(auth.uid.toString())
+        firestore.collection("favorites").document(auth.currentUser!!.uid)
             .set(map, SetOptions.merge())
     }
 
@@ -29,7 +29,7 @@ class FavoriteRemoteRepositoryImpl @Inject constructor(
         val map = mapOf(
             "favorites" to FieldValue.arrayRemove(coffeeId)
         )
-        firestore.collection("favorites").document(auth.uid.toString())
+        firestore.collection("favorites").document(auth.currentUser!!.uid)
             .set(map, SetOptions.merge())
     }
 }
