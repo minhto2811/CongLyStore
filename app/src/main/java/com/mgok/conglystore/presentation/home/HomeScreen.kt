@@ -3,13 +3,19 @@ package com.mgok.conglystore.presentation.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -37,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -47,8 +54,8 @@ import androidx.compose.ui.unit.dp
 import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.presentation.home.tabs.tab_cart.TabCart
 import com.mgok.conglystore.presentation.home.tabs.tab_fav.TabFavorite
+import com.mgok.conglystore.presentation.home.tabs.tab_history.TabHistory
 import com.mgok.conglystore.presentation.home.tabs.tab_home.TabHome
-import com.mgok.conglystore.presentation.home.tabs.tab_notify.TabNotify
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -70,7 +77,7 @@ fun HomeScreen(
                     Icons.Default.ShoppingCart to "Cà phê",
                     Icons.Default.ShoppingCart to "Đơn hàng",
                     Icons.Default.ShoppingCart to "Doanh thu",
-                    Icons.Default.ShoppingCart to "Thống kê",
+                    Icons.Default.ShoppingCart to "Top bán chạy",
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -100,13 +107,12 @@ fun HomeScreen(
                                 drawerState.close()
                                 changePage.invoke(
                                     when (index) {
-                                        0 -> {
-                                            MainActivity.Route.route_coffee_type
-                                        }
-
-                                        else -> {
-                                            MainActivity.Route.route_coffee
-                                        }
+                                        0 -> MainActivity.Route.route_coffee_type
+                                        1 -> MainActivity.Route.route_coffee
+                                        2 -> MainActivity.Route.route_bill_management
+                                        3 -> MainActivity.Route.route_revenue
+                                        4 -> MainActivity.Route.route_best_sale
+                                        else -> MainActivity.Route.route_coffee
                                     }
                                 )
                             }
@@ -163,11 +169,26 @@ fun BottomBar(pagerState: PagerState, coroutine: CoroutineScope) {
                             }
                         }
                     }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = item.icon),
-                            contentDescription = item.title,
-                            modifier = Modifier.scale(if (pagerState.currentPage == index) 1.8f else 1.4f)
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = item.icon),
+                                contentDescription = item.title,
+                                modifier = Modifier.scale(if (pagerState.currentPage == index) 1.8f else 1.4f)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Box(
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(5.dp)
+                                    .background(
+                                        color = if (pagerState.currentPage == index)
+                                            Color(0xFFC67C4E)
+                                        else
+                                            Color(0x748D8D8D),
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                            )
+                        }
                     }
                 }, colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color(0xFFC67C4E),
@@ -207,7 +228,7 @@ fun TabsContent(
                 changePage = changePage,
             )
 
-            3 -> TabNotify()
+            3 -> TabHistory(changePage = changePage)
             else -> {}
         }
     }

@@ -35,10 +35,15 @@ class OrderViewModel @Inject constructor(
     val stateUI = _stateUI.asStateFlow()
 
 
-    fun createBill(billId: String,price:Long) {
+    fun createBill(billId: String, price: Long, paymentStatus: Int = -1) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val bill = Bill(id = billId,price=price, address = _stateUI.value.address!!)
+                val bill = Bill(
+                    id = billId,
+                    price = price,
+                    address = _stateUI.value.address!!,
+                    paymentStatus = paymentStatus
+                )
                 _stateUI.value.listCart.forEach {
                     val itemBill = ItemBill(
                         coffeeId = it.idCoffee,

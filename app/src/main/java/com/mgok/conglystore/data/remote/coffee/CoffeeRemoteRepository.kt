@@ -11,4 +11,8 @@ interface CoffeeRemoteRepository {
     suspend fun uploadImage(uri: Uri, uid: String): Uri
 
     suspend fun deleteImage(uri: String)
+
+    suspend fun updateSold(idCoffee: String, sold: Int)
+
+    suspend fun getListCoffeeBySold(): List<Coffee>
 }

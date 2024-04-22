@@ -43,6 +43,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.mgok.conglystore.R
 import com.mgok.conglystore.component.BackgroundDelete
 import com.mgok.conglystore.component.LotifiesCompose
+import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.data.remote.coffee.Coffee
 
 
@@ -58,6 +59,8 @@ fun TabFavorite(
     LaunchedEffect(Unit) {
         favoriteViewModel.getFavorite()
     }
+    
+    MyLoadingDialog(visible = stateUI.loading)
 
     if (stateUI.listCoffee.isEmpty()) {
         Box(

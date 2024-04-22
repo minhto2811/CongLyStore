@@ -15,6 +15,7 @@ import com.mgok.conglystore.usecases.user.DeleteAvatarUseCase
 import com.mgok.conglystore.usecases.user.UpdateAvatarUseCase
 import com.mgok.conglystore.usecases.user.UpdateAvatarWithLinkUserCase
 import com.mgok.conglystore.usecases.user.UpdateInfoUserUseCase
+import com.mgok.conglystore.usecases.user.UserSignOutUseCase
 import com.mgok.conglystore.utilities.convertMillisToDate
 import com.mgok.conglystore.utilities.isValidFullname
 import com.mgok.conglystore.utilities.isValidNumberphone
@@ -36,7 +37,8 @@ class UpdateUserViewModel @Inject constructor(
     private val updateAvatarUseCase: UpdateAvatarUseCase,
     private val deleteAvatarUseCase: DeleteAvatarUseCase,
     private val updateInfoUserUseCase: UpdateInfoUserUseCase,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val signOutUseCase: UserSignOutUseCase,
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(UpdateInfoUserState())
@@ -85,6 +87,16 @@ class UpdateUserViewModel @Inject constructor(
             numberphone = numberphone.value,
             role = role.intValue
         )
+    }
+
+    fun signOut() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                signOutUseCase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
 

@@ -19,6 +19,5 @@ fun LotifiesCompose(
         modifier = modifier, composition = composition,
         iterations = iterations,
         contentScale = ContentScale.Crop,
-
     )
 }

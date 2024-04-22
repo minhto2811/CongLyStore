@@ -85,6 +85,7 @@ class NewCoffeeViewModel @Inject constructor(
             price.value = ""
         } catch (e: NumberFormatException) {
             e.printStackTrace()
+            _stateUI.update { it.copy(error = "Giá phải là số") }
         }
     }
 

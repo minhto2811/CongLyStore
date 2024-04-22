@@ -1,6 +1,5 @@
 package com.mgok.conglystore.presentation.order
 
-import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,11 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -34,12 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.mgok.conglystore.component.ButtonPayment
 import com.mgok.conglystore.component.MyLoadingDialog
+import com.mgok.conglystore.component.Title
 import com.mgok.conglystore.component.TopBar
 import com.mgok.conglystore.data.remote.address.Address
 import com.mgok.conglystore.data.remote.cart.Cart
 import com.mgok.conglystore.data.remote.coffee.Coffee
-import vn.momo.momo_partner.AppMoMoLib
+import com.mgok.conglystore.utilities.openMomoPay
 import java.util.UUID
 
 
@@ -48,7 +48,8 @@ fun OrderScreen(
     addressId: String?,
     onPop: () -> Unit,
     orderViewModel: OrderViewModel = hiltViewModel(),
-    onSelectAddress: (String) -> Unit
+    onSelectAddress: (String) -> Unit,
+    onOrder: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         orderViewModel.getListCart()
@@ -66,7 +67,8 @@ fun OrderScreen(
             modifier = Modifier.padding(
                 top = paddingValue.calculateTopPadding(),
                 start = 20.dp,
-                end = 20.dp
+                end = 20.dp,
+                bottom = paddingValue.calculateBottomPadding()
             )
         ) {
             item {
@@ -77,48 +79,51 @@ fun OrderScreen(
             }
             item {
                 Title(title = "Địa chỉ")
-                AdressSelected(address = stateUI.address){
+                AdressSelected(address = stateUI.address) {
                     onSelectAddress.invoke(stateUI.address?.id ?: "1")
+                }
+            }
+            val price: Long = (stateUI.totalPrice * 24000).toLong()
+            item {
+                Title(title = "Tổng tiền")
+                Card(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()) {
+                    Text(
+                        text = "$price đồng",
+                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 22.dp)
+                    )
                 }
             }
             item {
                 Title(title = "Thanh toán")
-                MomoPayment {
-                    if (stateUI.address==null){
-                        Toast.makeText(context,"Địa chỉ trống",Toast.LENGTH_SHORT).show()
-                        return@MomoPayment
+                ButtonPayment(
+                    "Thanh toán qua ví Momo",
+                    "https://img.mservice.io/momo-payment/icon/images/logo512.png"
+                ) {
+                    if (stateUI.address == null) {
+                        Toast.makeText(context, "Địa chỉ trống", Toast.LENGTH_SHORT).show()
+                        return@ButtonPayment
                     }
                     val billId = UUID.randomUUID().toString()
-                    val price: Long = (stateUI.totalPrice * 24000).toLong()
-                    AppMoMoLib.getInstance().setAction(AppMoMoLib.ACTION.PAYMENT);
-                    AppMoMoLib.getInstance().setActionType(AppMoMoLib.ACTION_TYPE.GET_TOKEN)
-                    val eventValue: MutableMap<String, Any> = HashMap()
-                    val merchantName = "merchantName"
-                    val merchantCode = "123456"
-                    eventValue["merchantname"] =
-                        merchantName //Tên đối tác. được đăng ký tại https://business.momo.vn. VD: Google, Apple, Tiki , CGV Cinemas
-                    eventValue["merchantcode"] =
-                        merchantCode //Mã đối tác, được cung cấp bởi MoMo tại https://business.momo.vn
-                    eventValue["amount"] = price//Kiểu integer
-                    eventValue["orderId"] = billId
-                    eventValue["orderLabel"] = "Mã đơn hàng" //gán nhãn
-                    eventValue["merchantnamelabel"] = "Dịch vụ" //gán nhãn
-
-                    eventValue["fee"] = 0 //Kiểu integer
-
-                    eventValue["description"] =
-                        "" //mô tả đơn hàng - short description
-                    //client extra data
-
-                    //client extra data
-                    eventValue["requestId"] =
-                        merchantCode + "merchant_billId_" + System.currentTimeMillis()
-                    eventValue["partnerCode"] = merchantCode
-                    eventValue["extraData"] = ""
-                    eventValue["extra"] = ""
-                    AppMoMoLib.getInstance().requestMoMoCallBack(context as Activity, eventValue)
+                    openMomoPay(context,billId,price)
                     orderViewModel.createBill(billId, price)
                 }
+                Spacer(modifier = Modifier.height(26.dp))
+
+                ButtonPayment(
+                    "Thanh toán khi nhận hàng",
+                    "https://camautech.com/wp-content/uploads/2022/12/icon-thanh-toan.png"
+                ) {
+                    if (stateUI.address == null) {
+                        Toast.makeText(context, "Địa chỉ trống", Toast.LENGTH_SHORT).show()
+                        return@ButtonPayment
+                    }
+                    val billId = UUID.randomUUID().toString()
+                    orderViewModel.createBill(billId, price, 1)
+                    onOrder()
+                }
+                Spacer(modifier = Modifier.height(26.dp))
             }
         }
 
@@ -126,30 +131,6 @@ fun OrderScreen(
     }
 }
 
-@Composable
-fun MomoPayment(onclick: () -> Unit) {
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth(),
-        onClick = onclick
-    ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SubcomposeAsyncImage(
-                modifier = Modifier.size(44.dp),
-                model = "https://img.mservice.io/momo-payment/icon/images/logo512.png",
-                loading = {
-                    CircularProgressIndicator()
-                },
-                contentDescription = "momo"
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "Thanh toán qua ví Momo")
-        }
-    }
-}
 
 @Composable
 fun AdressSelected(address: Address?, onSelectAddress: () -> Unit) {
@@ -222,9 +203,3 @@ fun ItemCart(coffee: Coffee) {
 }
 
 
-@Composable
-fun Title(title: String) {
-    Row(modifier = Modifier.padding(vertical = 16.dp)) {
-        Text(text = title)
-    }
-}
