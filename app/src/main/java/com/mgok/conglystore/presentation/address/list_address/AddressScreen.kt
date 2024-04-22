@@ -94,8 +94,10 @@ fun AddressScreen(
                 items = stateUI.listAddress,
                 key = { it.id }
             ) { address ->
+                val selected = if (addressSelectedId == null) null else
+                    address.id == addressSelectedId || stateUI.listAddress.size == 1
                 AddressItem(
-                    selected = address.id == addressSelectedId || stateUI.listAddress.size == 1,
+                    selected = selected,
                     address = address,
                     changePage = changePage,
                     deleteDialog = {
@@ -169,7 +171,7 @@ fun AddressScreen(
 
 @Composable
 fun AddressItem(
-    selected: Boolean,
+    selected: Boolean?,
     address: Address,
     changePage: (String, String?) -> Unit,
     deleteDialog: () -> Unit,

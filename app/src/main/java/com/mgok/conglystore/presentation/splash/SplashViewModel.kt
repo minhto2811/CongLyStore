@@ -22,11 +22,8 @@ class SplashViewModel @Inject constructor(
     private val _route = MutableStateFlow<String?>(null)
     val route = _route.asStateFlow()
 
-    init {
-        checkOut()
-    }
 
-    private fun checkOut() {
+     fun checkOut() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (getFireBaseUserUseCase() == null) {

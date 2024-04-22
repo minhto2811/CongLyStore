@@ -21,6 +21,9 @@ import com.mgok.conglystore.presentation.address.add_address.NewAddressScreen
 import com.mgok.conglystore.presentation.address.list_address.AddressScreen
 import com.mgok.conglystore.presentation.address.map.MapScreen
 import com.mgok.conglystore.presentation.auth.AuthScreen
+import com.mgok.conglystore.presentation.best_sale.BestSaleScreen
+import com.mgok.conglystore.presentation.bill.detail.BillDetailScreen
+import com.mgok.conglystore.presentation.bill.manage.BillManagementScreen
 import com.mgok.conglystore.presentation.coffee.detail.DetailProductScreen
 import com.mgok.conglystore.presentation.coffee.manager_coffee_type.CoffeeTypeScreen
 import com.mgok.conglystore.presentation.coffee.manager_product.NewCoffeeScreen
@@ -28,11 +31,15 @@ import com.mgok.conglystore.presentation.coffee.search.SearchCoffeeScreen
 import com.mgok.conglystore.presentation.home.HomeScreen
 import com.mgok.conglystore.presentation.order.OrderScreen
 import com.mgok.conglystore.presentation.order.ResultScreen
+import com.mgok.conglystore.presentation.revenue.RevenueScreen
 import com.mgok.conglystore.presentation.splash.SplashScreen
+import com.mgok.conglystore.presentation.user.payment_error.PaymentErrorScreen
+import com.mgok.conglystore.presentation.user.refund.RefundScreen
 import com.mgok.conglystore.presentation.user.settings.SettingsScreen
 import com.mgok.conglystore.presentation.user.update.UpdateInfoUserScreen
 import com.mgok.conglystore.ui.theme.CongLyStoreTheme
 import dagger.hilt.android.AndroidEntryPoint
+import org.json.JSONObject
 import vn.momo.momo_partner.AppMoMoLib
 
 
@@ -46,13 +53,19 @@ class MainActivity : ComponentActivity() {
         const val route_settings = "settings"
         const val route_coffee_type = "coffee_type"
         const val route_coffee = "coffee"
-        const val route_detail_coffee = "detail_coffee/{coffeeId}"
+        const val route_detail_coffee = "detail_coffee"
         const val route_search = "search_coffee"
         const val rout_order = "order"
         const val route_address = "address"
         const val route_new_address = "new_address"
         const val route_map = "map"
         const val route_result = "result"
+        const val route_bill_detail = "bill_detail"
+        const val route_payment_error = "payment_error"
+        const val route_refund = "refund"
+        const val route_bill_management = "bill_management"
+        const val route_revenue = "revenue"
+        const val route_best_sale = "best_sale"
     }
 
     private lateinit var navController: NavHostController
@@ -82,7 +95,7 @@ class MainActivity : ComponentActivity() {
                         composable(Route.route_auth) {
                             AuthScreen { route ->
                                 navController.navigate(route) {
-                                    popUpTo(route) {
+                                    popUpTo(Route.route_auth) {
                                         inclusive = true
                                     }
                                     launchSingleTop = true
@@ -114,7 +127,6 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Route.route_splash)
                             }, changePage = { route ->
                                 navController.navigate(route)
-
                             })
                         }
 
@@ -132,7 +144,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            Route.route_detail_coffee, arguments = listOf(navArgument("coffeeId") {
+                            "${Route.route_detail_coffee}/coffeeId={coffeeId}",
+                            arguments = listOf(navArgument("coffeeId") {
                                 type = NavType.StringType
                             })
                         ) { backStackEntry ->
@@ -161,6 +174,14 @@ class MainActivity : ComponentActivity() {
                                     val direct =
                                         "${Route.route_address}?addressSelectedId=$addressSelectedId"
                                     navController.navigate(direct)
+                                },
+                                onOrder = {
+                                    navController.navigate(Route.route_result) {
+                                        popUpTo(Route.route_splash) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 })
                         }
 
@@ -231,18 +252,20 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            "${Route.route_result}/orderId=orderId/result={result}",
-                            arguments = listOf(navArgument("result") {
+                            "${Route.route_result}?orderId={orderId}?status={status}",
+                            arguments = listOf(navArgument("status") {
                                 type = NavType.IntType
+                                defaultValue = 0
                             }, navArgument("orderId") {
                                 type = NavType.StringType
+                                nullable = true
                             })
                         ) { backStackEntry ->
-                            val result =
-                                backStackEntry.arguments?.getInt("result")
+                            val status =
+                                backStackEntry.arguments?.getInt("status")
                             val orderId =
                                 backStackEntry.arguments?.getString("orderId")
-                            ResultScreen(result = result,
+                            ResultScreen(status = status,
                                 orderId = orderId,
                                 goHome = {
                                     navController.navigate(Route.route_home) {
@@ -252,6 +275,88 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 })
+                        }
+
+                        composable(
+                            "${Route.route_bill_detail}/billId={billId}?isUpdatePaymentStatus={isUpdatePaymentStatus}&epId={epId}&refundId={refundId}&refundStatus={refundStatus}",
+                            listOf(
+                                navArgument("billId") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("isUpdatePaymentStatus") {
+                                    type = NavType.BoolType
+                                    defaultValue = false
+                                },
+                                navArgument("epId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                },
+                                navArgument("refundId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                },
+                                navArgument("refundStatus") {
+                                    type = NavType.IntType
+                                    defaultValue = 0
+                                },
+                            )
+                        ) { entry ->
+                            val billId = entry.arguments?.getString("billId")
+                            val epId = entry.arguments?.getString("epId")
+                            val refundId = entry.arguments?.getString("refundId")
+                            val refundStatus = entry.arguments?.getInt("refundStatus")
+                            Log.e("onCreate: ", refundId + " <><><><> " + refundStatus)
+                            val isUpdatePaymentStatus =
+                                entry.arguments?.getBoolean("isUpdatePaymentStatus") ?: false
+                            BillDetailScreen(
+                                isUpdatePaymentStatus = isUpdatePaymentStatus,
+                                billId = billId,
+                                refundStatus = refundStatus,
+                                refundId = refundId,
+                                epId = epId,
+                                onPop = { navController.popBackStack() }
+                            )
+                        }
+                        composable(Route.route_payment_error) {
+                            PaymentErrorScreen(onPop = {
+                                navController.popBackStack()
+                            },
+                                onClick = { epId, billId ->
+                                    navController.navigate("${Route.route_bill_detail}/billId=$billId?epId=$epId")
+                                })
+                        }
+
+                        composable(Route.route_refund) {
+                            RefundScreen(
+                                onPop = {
+                                    navController.popBackStack()
+                                },
+                                onNavigate = { refundId, billId, refundStatus ->
+                                    navController.navigate("${Route.route_bill_detail}/billId=$billId?refundId=$refundId&refundStatus=$refundStatus")
+                                }
+                            )
+                        }
+
+                        composable(Route.route_bill_management) {
+                            BillManagementScreen(
+                                onPop = { navController.popBackStack() },
+                                onClickBill = { billId ->
+                                    navController.navigate("${Route.route_bill_detail}/billId=${billId}")
+                                }
+                            )
+                        }
+
+                        composable(Route.route_revenue) {
+                            RevenueScreen(
+                                onPop = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable(Route.route_best_sale) {
+                            BestSaleScreen(
+                                onPop = { navController.popBackStack() },
+                                onNavigate = { navController.navigate(it) }
+                            )
                         }
                     }
 
@@ -266,23 +371,29 @@ class MainActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AppMoMoLib.getInstance().REQUEST_CODE_MOMO && resultCode == Activity.RESULT_OK) {
             data?.let {
+                var isUpdatePaymentStatus: Boolean = false
+                data.extras?.let { extras ->
+                    extras.getString("extra")?.let { data ->
+                        isUpdatePaymentStatus =
+                            JSONObject(data)["isUpdatePaymentStatus"].toString().toBoolean()
+                    }
+                }
                 val status = it.getIntExtra("status", -1)
                 val orderId = it.getStringExtra("orderId")
-                val allKeys = it.extras!!.keySet()
-                for (key in allKeys) {
-                    val value = it.extras!!.get(key)
-                    Log.d("BundleData", "$key: $value")
-                }
                 val direct = if (status == 0) {
-                    "${Route.route_result}/orderId=${orderId}/result=0"
+                    if (isUpdatePaymentStatus) {
+                        "${Route.route_bill_detail}/billId=${orderId}?isUpdatePaymentStatus=$isUpdatePaymentStatus"
+                    } else {
+                        "${Route.route_result}?orderId=${orderId}?status=0"
+                    }
                 } else {
-                    "${Route.route_result}/orderId=${orderId}/result=-1"
+                    "${Route.route_result}?orderId=${orderId}?status=-1"
                 }
                 navController.navigate(direct) {
                     popUpTo(Route.route_home) {
-                        inclusive = true
+                        inclusive = !isUpdatePaymentStatus
                     }
-                    launchSingleTop = true
+                    launchSingleTop = !isUpdatePaymentStatus
                 }
             }
         }

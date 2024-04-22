@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,7 +31,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyTextField
@@ -48,7 +48,7 @@ fun TabSignUp(
     ) {
         val context = LocalContext.current
         rememberCoroutineScope()
-        val state by signUpViewModel.state.collectAsStateWithLifecycle()
+        val state by signUpViewModel.state.collectAsState()
 
 
         LaunchedEffect(state.message) {

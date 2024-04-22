@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.twotone.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,9 +68,12 @@ fun SettingsScreen(
             MyLabelButton(icon = Icons.Default.LocationOn, title = "Sổ địa chỉ") {
                 changePage.invoke(MainActivity.Route.route_address)
             }
+            MyLabelButton(icon = Icons.Default.Info, title = "Báo lỗi thanh toán") {
+                changePage.invoke(MainActivity.Route.route_payment_error)
+            }
 
-            MyLabelButton(icon = Icons.Default.Lock, title = "Đổi mật khẩu") {
-
+            MyLabelButton(icon = Icons.TwoTone.Refresh, title = "Yêu cầu hoàn hiền") {
+                changePage.invoke(MainActivity.Route.route_refund)
             }
         }
     }

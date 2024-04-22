@@ -24,8 +24,8 @@ data class BottomNavigationItem(
                 icon = R.drawable.icon_bag,
             ),
             BottomNavigationItem(
-                title = "Thông báo",
-                icon = R.drawable.icon_notifiaction,
+                title = "Đơn hàng",
+                icon = R.drawable.icon_history,
             ),
         )
     }

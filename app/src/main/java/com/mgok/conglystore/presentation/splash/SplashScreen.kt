@@ -24,6 +24,9 @@ fun SplashScreen(
     callback: (String) -> Unit
 ) {
     val route by splashViewModel.route.collectAsState()
+    LaunchedEffect(Unit) {
+        splashViewModel.checkOut()
+    }
 
     LaunchedEffect(route) {
         delay(1000)

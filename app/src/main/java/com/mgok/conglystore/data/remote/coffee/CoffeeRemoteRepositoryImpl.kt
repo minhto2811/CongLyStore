@@ -22,6 +22,20 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
         storage.getReferenceFromUrl(uri).delete().await()
     }
 
+    override suspend fun updateSold(idCoffee: String, sold: Int) {
+        val snapshot = firestore.collection("coffees").document(idCoffee)
+        val coffee = snapshot.get().await()
+        if (coffee.exists()) {
+            val data = coffee.toObject(Coffee::class.java)!!.sold + sold
+            snapshot.update("quantity", data).await()
+        }
+    }
+
+    override suspend fun getListCoffeeBySold(): List<Coffee> {
+        val snapshot = firestore.collection("coffees").orderBy("sold").get().await()
+        return snapshot.toObjects(Coffee::class.java)
+    }
+
     override suspend fun getListCoffee(): List<Coffee> {
         val snapshot = firestore.collection("coffees").get().await()
         return snapshot.toObjects(Coffee::class.java)

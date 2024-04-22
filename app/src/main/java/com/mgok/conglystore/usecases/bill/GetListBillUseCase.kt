@@ -6,5 +6,6 @@ import javax.inject.Inject
 class GetListBillUseCase @Inject constructor(
     private val billRemoteRepository: BillRemoteRepository
 ) {
-    operator suspend fun invoke() = billRemoteRepository.getListBill()
+
+    suspend operator fun invoke(status:Int) = billRemoteRepository.getListBill(status)
 }

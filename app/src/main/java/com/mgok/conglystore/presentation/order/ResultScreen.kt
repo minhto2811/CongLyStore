@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun ResultScreen(
     orderId: String?,
-    result: Int?,
+    status: Int?,
     goHome: () -> Unit,
     resultViewModel: ResultViewModel = hiltViewModel()
 
@@ -33,9 +33,10 @@ fun ResultScreen(
     var countDown by remember {
         mutableIntStateOf(10)
     }
-    val raw = if (result == null || result == -1) R.raw.failed_animation
-    else {
-        resultViewModel.updateStatus(orderId!!, 0)
+    val raw = if (status == null || status == -1) {
+        R.raw.failed_animation
+    } else {
+        orderId?.let { resultViewModel.updateStatus(it, 0) }
         R.raw.success_animation
     }
 

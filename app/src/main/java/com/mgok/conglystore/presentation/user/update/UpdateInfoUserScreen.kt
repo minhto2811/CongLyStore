@@ -26,17 +26,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,10 +58,10 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.mgok.conglystore.R
+import com.mgok.conglystore.component.DialogDatePicker
 import com.mgok.conglystore.component.MyElevatedButton
 import com.mgok.conglystore.component.MyLoadingDialog
 import com.mgok.conglystore.component.MyTextField
-import com.mgok.conglystore.presentation.user.settings.SettingsViewModel
 import com.mgok.conglystore.utilities.NoRippleInteractionSource
 import java.util.Calendar
 
@@ -75,7 +70,6 @@ import java.util.Calendar
 @Composable
 fun UpdateInfoUserScreen(
     updateUserViewModel: UpdateUserViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     onPopBackStack: () -> Unit,
     onHomeScreen: () -> Unit,
 ) {
@@ -278,7 +272,7 @@ fun UpdateInfoUserScreen(
                     indication = null,
                     interactionSource = NoRippleInteractionSource()
                 ) {
-                    settingsViewModel.signOut()
+                    updateUserViewModel.signOut()
                     updateUserViewModel.avatar?.let { updateUserViewModel.deleteAvatar(it) }
                     onPopBackStack()
                 }
@@ -360,36 +354,4 @@ fun RadioGroupGender(gender: MutableState<Int>) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DialogDatePicker(
-    datePickerState: DatePickerState,
-    onClose: (Long?) -> Unit
-) {
-    DatePickerDialog(
-        onDismissRequest = { },
-        confirmButton = {
-            TextButton(onClick = {
-                onClose.invoke(datePickerState.selectedDateMillis!!)
-            }) {
-                Text(text = "Xác nhận")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = {
-                onClose.invoke(null)
-            }) {
-                Text(text = "Quay lại")
-            }
-        },
-        colors = DatePickerDefaults.colors(
-            containerColor = Color.White,
-        )
-
-    ) {
-        DatePicker(
-            state = datePickerState,
-        )
-    }
-}
 

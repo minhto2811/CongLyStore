@@ -300,7 +300,7 @@ fun TabHome(
         items(stateUI.listCoffee.size) { index ->
             val item = stateUI.listCoffee[index]
             CoffeeItem(coffe = item, isRight = index % 2 == 0, onClick = {
-                changePage.invoke("detail_coffee/${item.id}")
+                changePage.invoke("${MainActivity.Route.route_detail_coffee}/coffeeId=${item.id}")
             }, addToCart = {
                 coffeeSelected.value = item
             })

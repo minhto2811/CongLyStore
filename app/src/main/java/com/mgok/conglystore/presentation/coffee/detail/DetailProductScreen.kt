@@ -233,6 +233,16 @@ fun DetailProductScreen(
                         .background(color = Color(0xFFE1E1E1))
                 )
                 Text(
+                    text = "Kích cỡ", style = MaterialTheme.typography.labelLarge,
+                    color = Color(0xFF2F2D2C),
+                    modifier = Modifier.padding(vertical = 20.dp)
+                )
+
+                ListSizes(stateUI.coffee?.sizes!!, stateUI.size?.size) {
+                    detailCoffeeViewModel.updateSizeSelected(it)
+                }
+                
+                Text(
                     text = "Mô tả", style = MaterialTheme.typography.labelLarge,
                     color = Color(0xFF2F2D2C),
                     modifier = Modifier.padding(vertical = 20.dp)
@@ -243,15 +253,7 @@ fun DetailProductScreen(
                     color = Color(0xFF9B9B9B),
                 )
 
-                Text(
-                    text = "Kích cỡ", style = MaterialTheme.typography.labelLarge,
-                    color = Color(0xFF2F2D2C),
-                    modifier = Modifier.padding(vertical = 20.dp)
-                )
 
-                ListSizes(stateUI.coffee?.sizes!!, stateUI.size?.size) {
-                    detailCoffeeViewModel.updateSizeSelected(it)
-                }
 
 
 
@@ -285,7 +287,7 @@ fun BottomBar(sizeState: Size?, isAdding: Boolean, addToCart: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column (modifier = Modifier.width(100.dp)){
+            Column(modifier = Modifier.width(100.dp)) {
                 Text(
                     text = "Giá",
                     style = MaterialTheme.typography.labelSmall,
@@ -301,7 +303,9 @@ fun BottomBar(sizeState: Size?, isAdding: Boolean, addToCart: () -> Unit) {
             if (isAdding) {
                 val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.success_animation))
                 LottieAnimation(
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                     composition = composition,
                     contentScale = ContentScale.Inside,
                 )

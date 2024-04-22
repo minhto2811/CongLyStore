@@ -11,13 +11,15 @@ class AddressRemoteRepositoryImpl @Inject constructor(
 ) : AddressRemoteRepository {
     override suspend fun getListAddress(): List<Address> {
         val snapshot =
-            firestore.collection("address").whereEqualTo("userId", auth.currentUser!!.uid).get().await()
+            firestore.collection("address").whereEqualTo("userId", auth.currentUser!!.uid).get()
+                .await()
         return snapshot.toObjects(Address::class.java)
     }
 
     override suspend fun getFirstAddress(): Address {
         val snapshot =
-            firestore.collection("address").limit(1L).get().await()
+            firestore.collection("address").whereEqualTo("userId", auth.currentUser!!.uid).limit(1L)
+                .get().await()
         return snapshot.toObjects(Address::class.java)[0]
     }
 
