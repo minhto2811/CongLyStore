@@ -77,7 +77,7 @@ fun TabSignUp(
                 hint = "Nhập địa chỉ email",
                 keyboardType = KeyboardType.Email,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                onValidate = { signUpViewModel.validate() }
+                onValidate = { signUpViewModel.validateEmail() }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -92,7 +92,7 @@ fun TabSignUp(
                 isPassword = true,
                 keyboardType = KeyboardType.Password,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                onValidate = { signUpViewModel.validate() }
+                onValidate = { signUpViewModel.validatePassword() }
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(

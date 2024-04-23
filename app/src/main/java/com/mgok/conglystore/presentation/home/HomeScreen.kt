@@ -42,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.presentation.home.tabs.tab_cart.TabCart
 import com.mgok.conglystore.presentation.home.tabs.tab_fav.TabFavorite
@@ -64,7 +67,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     changePage: (String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val stateUI by viewModel.state.collectAsStateWithLifecycle()
     val coroutine = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { BottomNavigationItem.itemsBottom.size })
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -108,7 +113,7 @@ fun HomeScreen(
                                 changePage.invoke(
                                     when (index) {
                                         0 -> MainActivity.Route.route_coffee_type
-                                        1 -> MainActivity.Route.route_coffee
+                                        1 -> MainActivity.Route.route_manage_product
                                         2 -> MainActivity.Route.route_bill_management
                                         3 -> MainActivity.Route.route_revenue
                                         4 -> MainActivity.Route.route_best_sale
@@ -127,7 +132,7 @@ fun HomeScreen(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                BottomBar(pagerState, coroutine)
+                BottomBar(pagerState, coroutine, stateUI.role)
             },
             containerColor = Color(0x97E4DEDE),
         ) { paddingValue ->
@@ -143,7 +148,7 @@ fun HomeScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BottomBar(pagerState: PagerState, coroutine: CoroutineScope) {
+fun BottomBar(pagerState: PagerState, coroutine: CoroutineScope, role: Int) {
     NavigationBar(
         tonalElevation = 10.dp,
         modifier = Modifier
@@ -157,6 +162,7 @@ fun BottomBar(pagerState: PagerState, coroutine: CoroutineScope) {
     ) {
         BottomNavigationItem.itemsBottom.forEachIndexed { index, item ->
             NavigationBarItem(
+                enabled = if (role == 0) index == 0 else true,
                 selected = pagerState.currentPage == index, onClick = {
                     coroutine.launch {
                         pagerState.animateScrollToPage(index)

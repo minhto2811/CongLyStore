@@ -26,8 +26,9 @@ import com.mgok.conglystore.presentation.bill.detail.BillDetailScreen
 import com.mgok.conglystore.presentation.bill.manage.BillManagementScreen
 import com.mgok.conglystore.presentation.coffee.detail.DetailProductScreen
 import com.mgok.conglystore.presentation.coffee.manager_coffee_type.CoffeeTypeScreen
-import com.mgok.conglystore.presentation.coffee.manager_product.NewCoffeeScreen
+import com.mgok.conglystore.presentation.coffee.manager_product.ProductManagementScreen
 import com.mgok.conglystore.presentation.coffee.search.SearchCoffeeScreen
+import com.mgok.conglystore.presentation.coffee.upsert.NewCoffeeScreen
 import com.mgok.conglystore.presentation.home.HomeScreen
 import com.mgok.conglystore.presentation.order.OrderScreen
 import com.mgok.conglystore.presentation.order.ResultScreen
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
         const val route_bill_management = "bill_management"
         const val route_revenue = "revenue"
         const val route_best_sale = "best_sale"
+        const val route_manage_product = "manage_product"
     }
 
     private lateinit var navController: NavHostController
@@ -137,10 +139,19 @@ class MainActivity : ComponentActivity() {
                         }
 
                         //admin
-                        composable(Route.route_coffee) {
-                            NewCoffeeScreen(onPop = {
-                                navController.popBackStack()
+                        composable(
+                            "${Route.route_coffee}?coffeeId={coffeeId}",
+                            listOf(navArgument("coffeeId") {
+                                type = NavType.StringType
+                                nullable = true
                             })
+                        ) { backStackEntry ->
+                            val coffeeId = backStackEntry.arguments?.getString("coffeeId")
+                            NewCoffeeScreen(
+                                coffeeId = coffeeId,
+                                onPop = {
+                                    navController.popBackStack()
+                                })
                         }
 
                         composable(
@@ -356,6 +367,18 @@ class MainActivity : ComponentActivity() {
                             BestSaleScreen(
                                 onPop = { navController.popBackStack() },
                                 onNavigate = { navController.navigate(it) }
+                            )
+                        }
+
+                        composable(Route.route_manage_product) {
+                            ProductManagementScreen(
+                                onPop = { navController.popBackStack() },
+                                onNavigate = { coffeeId ->
+                                    val route =
+                                        if (coffeeId != null) "${Route.route_coffee}?coffeeId=$coffeeId"
+                                        else Route.route_coffee
+                                    navController.navigate(route)
+                                }
                             )
                         }
                     }

@@ -1,4 +1,4 @@
-package com.mgok.conglystore.presentation.coffee.manager_product
+package com.mgok.conglystore.presentation.coffee.upsert
 
 import android.net.Uri
 import com.mgok.conglystore.data.remote.coffee_type.CoffeeType

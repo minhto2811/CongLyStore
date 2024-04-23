@@ -1,4 +1,4 @@
-package com.mgok.conglystore.presentation.coffee.manager_product
+package com.mgok.conglystore.presentation.coffee.upsert
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -33,14 +33,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +66,7 @@ import com.mgok.conglystore.component.TopBar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NewCoffeeScreen(
+    coffeeId: String?,
     newCoffeeViewModel: NewCoffeeViewModel = hiltViewModel(),
     onPop: () -> Unit
 ) {
@@ -80,13 +80,15 @@ fun NewCoffeeScreen(
     val focusManager = LocalFocusManager.current
 
 
-    var expanded by remember {
-        mutableStateOf(false)
-    }
 
-    LaunchedEffect(stateUI.listCoffeeType) {
-        if (stateUI.listCoffeeType.isNotEmpty()) {
-            newCoffeeViewModel.nameCoffee.value = stateUI.listCoffeeType[0].name
+
+    LaunchedEffect(stateUI.listCoffeeType, coffeeId) {
+        if (coffeeId != null) {
+            newCoffeeViewModel.getCoffeeById(coffeeId)
+        } else {
+            if (stateUI.listCoffeeType.isNotEmpty()) {
+                newCoffeeViewModel.nameCoffee.value = stateUI.listCoffeeType[0].name
+            }
         }
     }
 
@@ -125,9 +127,11 @@ fun NewCoffeeScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {
-                expanded = !expanded
-            }) {
+            ExposedDropdownMenuBox(
+                expanded = newCoffeeViewModel.expanded.value,
+                onExpandedChange = {
+                    newCoffeeViewModel.expanded.value = it
+                }) {
                 MyTextField(
                     state = newCoffeeViewModel.nameCoffee,
                     hint = "Hãy thêm loại cà phê trước",
@@ -137,8 +141,8 @@ fun NewCoffeeScreen(
                     }),
                     readOnly = true
                 )
-                ExposedDropdownMenu(expanded = expanded,
-                    onDismissRequest = { expanded = !expanded }) {
+                ExposedDropdownMenu(expanded = newCoffeeViewModel.expanded.value,
+                    onDismissRequest = { newCoffeeViewModel.expanded.value = false }) {
                     stateUI.listCoffeeType.forEach { option ->
                         if (option.name != newCoffeeViewModel.nameCoffee.value) {
                             DropdownMenuItem(text = {
@@ -146,7 +150,7 @@ fun NewCoffeeScreen(
                             }, onClick = {
                                 focusManager.clearFocus()
                                 newCoffeeViewModel.nameCoffee.value = option.name
-                                expanded = !expanded
+                                newCoffeeViewModel.expanded.value = false
                             })
                         }
                     }
@@ -257,6 +261,15 @@ fun NewCoffeeScreen(
                 )
             }
 
+            if (coffeeId != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                MyElevatedButton(
+                    title = "Xóa", onClick = {
+                        newCoffeeViewModel.dialogDel.value = true
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
 
@@ -271,6 +284,59 @@ fun NewCoffeeScreen(
             focusRequester = focusRequester
         ) {
             newCoffeeViewModel.addSize()
+        }
+        DialogDelete(newCoffeeViewModel.dialogDel) {
+            newCoffeeViewModel.deleteCoffee() {
+                onPop()
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogDelete(dialogDel: MutableState<Boolean>, delete: () -> Unit) {
+    if (dialogDel.value) {
+        Dialog(onDismissRequest = { dialogDel.value = false }) {
+            Column(
+                modifier = Modifier
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(16.dp)
+
+            ) {
+                Text(text = "Xác nhận xóa", style = MaterialTheme.typography.titleSmall)
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Sau khi xóa không thể khôi phục dữ liệu",
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = { dialogDel.value = false }) {
+                        Text(
+                            text = "Hủy",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                color = Color.Gray
+                            )
+                        )
+                    }
+                    TextButton(onClick = {
+                        delete()
+                        dialogDel.value = false
+                    }) {
+                        Text(
+                            text = "Xác nhận", style = MaterialTheme.typography.titleSmall.copy(
+                                color = Color.Black
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -317,6 +383,7 @@ fun DialogAddSize(
                     visible.value = false
                     callback()
                 })
+
             }
         }
     }

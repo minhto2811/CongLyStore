@@ -71,14 +71,17 @@ fun TabSignIn(
     )
 
     LaunchedEffect(state.route) {
-        state.route?.let { onNavigate.invoke(it) }
+        state.route?.let {
+            onNavigate.invoke(it)
+            signInViewModel.resetError()
+        }
     }
 
 
 
 
     LaunchedEffect(key1 = state.error) {
-        state.error?.let{ Toast.makeText(context, it, Toast.LENGTH_LONG).show()}
+        state.error?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
     }
 
 
