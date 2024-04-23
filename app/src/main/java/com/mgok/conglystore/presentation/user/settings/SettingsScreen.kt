@@ -65,15 +65,17 @@ fun SettingsScreen(
                 settingsViewModel.signOut()
                 onSignOut()
             }, title = stringResource(id = R.string.logout))
-            MyLabelButton(icon = Icons.Default.LocationOn, title = "Sổ địa chỉ") {
-                changePage.invoke(MainActivity.Route.route_address)
-            }
-            MyLabelButton(icon = Icons.Default.Info, title = "Báo lỗi thanh toán") {
-                changePage.invoke(MainActivity.Route.route_payment_error)
-            }
+            if (stateUI.user?.role == 1) {
+                MyLabelButton(icon = Icons.Default.LocationOn, title = "Sổ địa chỉ") {
+                    changePage.invoke(MainActivity.Route.route_address)
+                }
+                MyLabelButton(icon = Icons.Default.Info, title = "Báo lỗi thanh toán") {
+                    changePage.invoke(MainActivity.Route.route_payment_error)
+                }
 
-            MyLabelButton(icon = Icons.TwoTone.Refresh, title = "Yêu cầu hoàn hiền") {
-                changePage.invoke(MainActivity.Route.route_refund)
+                MyLabelButton(icon = Icons.TwoTone.Refresh, title = "Yêu cầu hoàn hiền") {
+                    changePage.invoke(MainActivity.Route.route_refund)
+                }
             }
         }
     }

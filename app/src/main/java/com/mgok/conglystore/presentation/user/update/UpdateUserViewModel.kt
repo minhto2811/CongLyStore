@@ -58,7 +58,7 @@ class UpdateUserViewModel @Inject constructor(
     var birthday by mutableLongStateOf(Calendar.getInstance().timeInMillis)
 
     val birthday2 by derivedStateOf {
-        mutableStateOf(convertMillisToDate(birthday))
+        mutableStateOf(convertMillisToDate(birthday).substring(0, 10))
     }
 
     val gender = mutableIntStateOf(0)

@@ -23,7 +23,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerState
@@ -55,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mgok.conglystore.MainActivity
+import com.mgok.conglystore.R
 import com.mgok.conglystore.presentation.home.tabs.tab_cart.TabCart
 import com.mgok.conglystore.presentation.home.tabs.tab_fav.TabFavorite
 import com.mgok.conglystore.presentation.home.tabs.tab_history.TabHistory
@@ -78,11 +78,13 @@ fun HomeScreen(
         drawerContent = {
             ModalDrawerSheet {
                 val drawerList = arrayOf(
-                    Icons.Default.ShoppingCart to "Loại cà phê",
-                    Icons.Default.ShoppingCart to "Cà phê",
-                    Icons.Default.ShoppingCart to "Đơn hàng",
-                    Icons.Default.ShoppingCart to "Doanh thu",
-                    Icons.Default.ShoppingCart to "Top bán chạy",
+                    R.drawable.icon_coffee_type to "Loại cà phê",
+                    R.drawable.icon_coffee to "Cà phê",
+                    R.drawable.icon_bill to "Đơn hàng",
+                    R.drawable.icon_revenue to "Doanh thu",
+                    R.drawable.icon_best_sale to "Top bán chạy",
+                    R.drawable.icon_error_payment to "Báo lỗi thanh toán",
+                    R.drawable.icon_refund to "Yêu cầu hoàn tiền",
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -103,7 +105,10 @@ fun HomeScreen(
                 drawerList.forEachIndexed { index, item ->
                     NavigationDrawerItem(
                         icon = {
-                            Icon(item.first, contentDescription = "")
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = item.first),
+                                contentDescription = ""
+                            )
                         },
                         label = { Text(text = item.second) },
                         selected = false,
@@ -117,6 +122,8 @@ fun HomeScreen(
                                         2 -> MainActivity.Route.route_bill_management
                                         3 -> MainActivity.Route.route_revenue
                                         4 -> MainActivity.Route.route_best_sale
+                                        5 -> MainActivity.Route.route_payment_error
+                                        6 -> MainActivity.Route.route_refund
                                         else -> MainActivity.Route.route_coffee
                                     }
                                 )
