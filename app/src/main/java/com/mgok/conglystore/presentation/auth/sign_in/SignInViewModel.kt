@@ -150,4 +150,8 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetError() {
+        _state.update { it.copy(error = null) }
+    }
 }

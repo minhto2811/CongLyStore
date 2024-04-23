@@ -37,12 +37,22 @@ class SignUpViewModel @Inject constructor(
     }
 
 
-    fun validate() {
+    fun validateEmail() {
         if (email.value.isNotEmpty() && !email.value.isValidEmail()) {
             warning = "Email không hợp lệ"
-        } else if (password.value.isNotEmpty() && !password.value.isValidPassword()) {
-            warning = "Mật khẩu nhiều hơn 5 kí tự"
+        } else {
+            warning = ""
         }
+
+    }
+
+    fun validatePassword() {
+        if (password.value.isNotEmpty() && !password.value.isValidPassword()) {
+            warning = "Mật khẩu nhiều hơn 5 kí tự"
+        } else {
+            warning = ""
+        }
+
     }
 
     fun createAccount() {

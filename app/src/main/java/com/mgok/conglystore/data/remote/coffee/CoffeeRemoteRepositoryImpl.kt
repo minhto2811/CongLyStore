@@ -1,6 +1,7 @@
 package com.mgok.conglystore.data.remote.coffee
 
 import android.net.Uri
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
@@ -32,12 +33,31 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getListCoffeeBySold(): List<Coffee> {
-        val snapshot = firestore.collection("coffees").orderBy("sold").get().await()
+        val snapshot = firestore.collection("coffees").whereEqualTo("delete", false).orderBy("quantity").orderBy("sold").get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 
+    override suspend fun filterCoffeeByQuery(querry: String): List<Coffee> {
+        val snapshot = firestore.collection("coffees")
+            .where(
+                Filter.and(
+                    Filter.or(
+                        Filter.greaterThanOrEqualTo("name", querry),
+                        Filter.greaterThanOrEqualTo("type", querry)
+                    ),
+                    Filter.equalTo("delete", false)
+                )
+            )
+            .get().await()
+        return snapshot.toObjects(Coffee::class.java)
+    }
+
+    override suspend fun deleteCoffee(idCoffee: String) {
+        firestore.collection("coffees").document(idCoffee).update("delete", true).await()
+    }
+
     override suspend fun getListCoffee(): List<Coffee> {
-        val snapshot = firestore.collection("coffees").get().await()
+        val snapshot = firestore.collection("coffees").whereEqualTo("delete", false).get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 
@@ -53,7 +73,7 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
 
     override suspend fun getListCoffeeByName(coffeeName: String): List<Coffee> {
         val snapshot =
-            firestore.collection("coffees").whereEqualTo("name", coffeeName).get().await()
+            firestore.collection("coffees").whereEqualTo("name", coffeeName).whereEqualTo("delete", false).orderBy("sold").get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 

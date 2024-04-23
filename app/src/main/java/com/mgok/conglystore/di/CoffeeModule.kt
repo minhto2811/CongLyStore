@@ -4,6 +4,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.mgok.conglystore.data.remote.coffee.CoffeeRemoteRepository
 import com.mgok.conglystore.data.remote.coffee.CoffeeRemoteRepositoryImpl
+import com.mgok.conglystore.usecases.coffee.DeleteCoffeeByIdUseCase
+import com.mgok.conglystore.usecases.coffee.FilterCoffeebyQuerryUseCase
 import com.mgok.conglystore.usecases.coffee.GetCoffeeByIdUseCase
 import com.mgok.conglystore.usecases.coffee.GetListCoffeeByNameUseCase
 import com.mgok.conglystore.usecases.coffee.GetListCoffeeBySold
@@ -72,9 +74,22 @@ object CoffeeModule {
     fun providesUpdateSoldProductUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): UpdateSoldProductUseCase {
         return UpdateSoldProductUseCase(coffeeRemoteRepository)
     }
+
     @Provides
     @Singleton
     fun providesGetListCoffeeBySold(coffeeRemoteRepository: CoffeeRemoteRepository): GetListCoffeeBySold {
         return GetListCoffeeBySold(coffeeRemoteRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesFilterCoffeebyQuerryUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): FilterCoffeebyQuerryUseCase {
+        return FilterCoffeebyQuerryUseCase(coffeeRemoteRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesDeleteCoffeeByIdUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): DeleteCoffeeByIdUseCase {
+        return DeleteCoffeeByIdUseCase(coffeeRemoteRepository)
     }
 }

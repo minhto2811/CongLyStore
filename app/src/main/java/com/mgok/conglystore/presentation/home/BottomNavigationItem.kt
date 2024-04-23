@@ -7,17 +7,17 @@ data class BottomNavigationItem(
     val title: String,
     @DrawableRes
     val icon: Int,
-    val badgeCount: Int? = null
+    val badgeCount: Int? = null,
 ) {
     companion object {
         val itemsBottom = listOf(
             BottomNavigationItem(
                 title = "Trang chủ",
-                icon = R.drawable.icon_home,
+                icon = R.drawable.icon_home
             ),
             BottomNavigationItem(
                 title = "Yêu thích",
-                icon = R.drawable.icon_heart,
+                icon = R.drawable.icon_heart
             ),
             BottomNavigationItem(
                 title = "Giỏ hàng",
