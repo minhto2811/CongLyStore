@@ -43,6 +43,7 @@ class NewCoffeeViewModel @Inject constructor(
 
     var nameCoffee = mutableStateOf("")
     val typeCoffee = mutableStateOf("")
+    val descriptionCoffee = mutableStateOf("")
     var imageCoffee by mutableStateOf<String?>(null)
     val sizes = mutableStateListOf<Size>()
     val expanded = mutableStateOf(false)
@@ -61,7 +62,8 @@ class NewCoffeeViewModel @Inject constructor(
                 name = nameCoffee.value,
                 type = typeCoffee.value,
                 image = imageCoffee,
-                sizes = sizes
+                sizes = sizes,
+                description = descriptionCoffee.value
             )
         )
     }
@@ -70,6 +72,7 @@ class NewCoffeeViewModel @Inject constructor(
         mutableStateOf(
             nameCoffee.value.isNotEmpty()
                     && typeCoffee.value.isNotEmpty()
+                    && descriptionCoffee.value.isNotEmpty()
                     && !imageCoffee.isNullOrEmpty()
                     && sizes.isNotEmpty()
         )
@@ -90,6 +93,7 @@ class NewCoffeeViewModel @Inject constructor(
                     nameCoffee.value = data.name
                     typeCoffee.value = data.type
                     imageCoffee = data.image
+                    descriptionCoffee.value = data.description
                     sizes.clear()
                     sizes.addAll(data.sizes)
                     Log.e("getCoffeeById: ", coffee.value.id)
@@ -140,6 +144,7 @@ class NewCoffeeViewModel @Inject constructor(
                 insertCoffeeUseCase.insertCoffee(coffee.value)
                 typeCoffee.value = ""
                 imageCoffee = null
+                descriptionCoffee.value = ""
                 sizes.clear()
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -33,7 +33,9 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getListCoffeeBySold(): List<Coffee> {
-        val snapshot = firestore.collection("coffees").whereEqualTo("delete", false).orderBy("quantity").orderBy("sold").get().await()
+        val snapshot =
+            firestore.collection("coffees").whereEqualTo("delete", false).orderBy("quantity")
+                .orderBy("sold").get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 
@@ -43,7 +45,7 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
                 Filter.and(
                     Filter.or(
                         Filter.greaterThanOrEqualTo("name", querry),
-                        Filter.greaterThanOrEqualTo("type", querry)
+                        Filter.greaterThanOrEqualTo("type", querry),
                     ),
                     Filter.equalTo("delete", false)
                 )
@@ -73,7 +75,8 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
 
     override suspend fun getListCoffeeByName(coffeeName: String): List<Coffee> {
         val snapshot =
-            firestore.collection("coffees").whereEqualTo("name", coffeeName).whereEqualTo("delete", false).orderBy("sold").get().await()
+            firestore.collection("coffees").whereEqualTo("name", coffeeName)
+                .whereEqualTo("delete", false).orderBy("sold").get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 

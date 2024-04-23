@@ -115,7 +115,7 @@ fun NewCoffeeScreen(
             })
     Scaffold(
         topBar = {
-            TopBar("Thêm sản phẩm", onPop)
+            TopBar(if (coffeeId == null) "Thêm sản phẩm" else "Cập nhật sản phẩm", onPop)
         }
     ) { paddingValues ->
 
@@ -123,7 +123,7 @@ fun NewCoffeeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .focusRequester(focusRequester)
-                .padding(top = paddingValues.calculateTopPadding(), start = 30.dp, end = 30.dp)
+                .padding(top = paddingValues.calculateTopPadding(), start = 30.dp, end = 30.dp, bottom = 30.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -166,6 +166,26 @@ fun NewCoffeeScreen(
                 }),
                 capitalization = KeyboardCapitalization.Words,
                 hasSpace = true
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Mô tả (*)",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            MyTextField(
+                state = newCoffeeViewModel.descriptionCoffee,
+                hint = "Nhập mô tả",
+                minLines = 3,
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                }),
+                capitalization = KeyboardCapitalization.Words,
+                hasSpace = true,
+                maxChar = 200,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -247,8 +267,9 @@ fun NewCoffeeScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
                 MyElevatedButton(
-                    title = "Thêm mới", onClick = {
+                    title = if (coffeeId == null) "Thêm mới" else "Cập nhật ", onClick = {
                         focusManager.clearFocus()
                         newCoffeeViewModel.insertCoffee()
                     }, enable = newCoffeeViewModel.enableButton.value
