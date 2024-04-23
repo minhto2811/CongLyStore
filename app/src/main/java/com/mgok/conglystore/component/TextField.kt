@@ -2,7 +2,8 @@ package com.mgok.conglystore.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +33,7 @@ import com.mgok.conglystore.utilities.NoRippleInteractionSource
 
 @Composable
 fun MyTextField(
+    minLines: Int = 1,
     state: MutableState<String>,
     hint: String,
     isPassword: Boolean = false,
@@ -50,6 +52,7 @@ fun MyTextField(
         mutableStateOf(!isPassword)
     }
     OutlinedTextField(
+        minLines = minLines,
         value = state.value,
         onValueChange = { text ->
             if (text.length <= maxChar) {
@@ -59,7 +62,8 @@ fun MyTextField(
         },
         enabled = enableb,
         modifier = modifier
-            .size(width = 376.dp, height = 56.dp)
+            .width(width = 376.dp)
+            .wrapContentHeight()
             .clickable(
                 indication = null,
                 interactionSource = NoRippleInteractionSource()
@@ -74,7 +78,7 @@ fun MyTextField(
                 color = Color(0xFFB3B3B3)
             )
         },
-        singleLine = true,
+        singleLine = minLines == 1,
         readOnly = readOnly,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(

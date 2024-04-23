@@ -1,6 +1,7 @@
 package com.mgok.conglystore.presentation.coffee.manager_product
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.usecases.coffee.FilterCoffeebyQuerryUseCase
@@ -19,11 +20,13 @@ class ProductManagementViewModel @Inject constructor(
     private val _stateUI = MutableStateFlow(ProductManagementStateUI())
     val stateUI get() = _stateUI.asStateFlow()
 
-    fun getData(querry: String = "") {
+    val querry = mutableStateOf("")
+
+    fun getData(isLoading:Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _stateUI.update { it.copy(loading = true) }
-                val list = filterCoffeebyQuerryUseCase.filter(querry)
+                _stateUI.update { it.copy(loading = isLoading) }
+                val list = filterCoffeebyQuerryUseCase.filter(querry.value)
                 Log.e( "getData: ",list.size.toString() )
                 _stateUI.update { it.copy(loading = false, list = list) }
             } catch (e: Exception) {
