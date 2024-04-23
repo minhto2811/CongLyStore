@@ -179,13 +179,13 @@ fun NewCoffeeScreen(
             MyTextField(
                 state = newCoffeeViewModel.descriptionCoffee,
                 hint = "Nhập mô tả",
-                minLines = 3,
+                minLines = 4,
                 keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus()
                 }),
                 capitalization = KeyboardCapitalization.Words,
                 hasSpace = true,
-                maxChar = 200,
+                maxChar = 500,
             )
 
             Spacer(modifier = Modifier.height(16.dp))

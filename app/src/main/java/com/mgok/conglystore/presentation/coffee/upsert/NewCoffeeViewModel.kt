@@ -146,6 +146,7 @@ class NewCoffeeViewModel @Inject constructor(
                 imageCoffee = null
                 descriptionCoffee.value = ""
                 sizes.clear()
+                id = UUID.randomUUID().toString()
             } catch (e: Exception) {
                 e.printStackTrace()
                 _stateUI.update { it.copy(error = e.message) }

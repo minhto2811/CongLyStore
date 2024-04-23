@@ -28,14 +28,16 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
         val coffee = snapshot.get().await()
         if (coffee.exists()) {
             val data = coffee.toObject(Coffee::class.java)!!.sold + sold
-            snapshot.update("quantity", data).await()
+            snapshot.update("sold", data).await()
         }
     }
 
     override suspend fun getListCoffeeBySold(): List<Coffee> {
-        val snapshot =
-            firestore.collection("coffees").whereEqualTo("delete", false).orderBy("quantity")
-                .orderBy("sold").get().await()
+        val snapshot = firestore.collection("coffees")
+            .whereEqualTo("delete", false)
+            .whereGreaterThan("sold", 0)
+            .orderBy("quantity")
+            .orderBy("sold").get().await()
         return snapshot.toObjects(Coffee::class.java)
     }
 
