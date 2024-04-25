@@ -11,14 +11,14 @@ import com.mgok.conglystore.usecases.cart.UpsertCartUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object CartModule {
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCartRemoteRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -27,26 +27,26 @@ object CartModule {
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpsertCartUseCase(cartRemoteRepository: CartRemoteRepository): UpsertCartUseCase {
         return UpsertCartUseCase(cartRemoteRepository)
     }
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListCartUseCase(cartRemoteRepository: CartRemoteRepository): GetListCartUseCase {
         return GetListCartUseCase(cartRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteCartByIdUseCase(cartRemoteRepository: CartRemoteRepository): DeleteCartByIdUseCase {
         return DeleteCartByIdUseCase(cartRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteAllBillUseCase(cartRemoteRepository: CartRemoteRepository): DeleteAllBillUseCase {
         return DeleteAllBillUseCase(cartRemoteRepository)
     }

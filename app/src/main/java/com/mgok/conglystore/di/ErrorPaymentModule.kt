@@ -11,15 +11,15 @@ import com.mgok.conglystore.usecases.error_payment.UpdatePaymentErrorStatusUseCa
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object ErrorPaymentModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesErrorPaymentRemote(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -28,25 +28,25 @@ object ErrorPaymentModule {
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListErrorPaymentUseCase(errorPaymentRemote: ErrorPaymentRemote): GetListErrorPaymentUseCase {
         return GetListErrorPaymentUseCase(errorPaymentRemote)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListErrorPaymentByUserUseCase(errorPaymentRemote: ErrorPaymentRemote): GetListErrorPaymentByUserUseCase {
         return GetListErrorPaymentByUserUseCase(errorPaymentRemote)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCreateErrorPaymentUseCase(errorPaymentRemote: ErrorPaymentRemote): CreateErrorPaymentUseCase {
         return CreateErrorPaymentUseCase(errorPaymentRemote)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdatePaymentErrorStatus(errorPaymentRemote: ErrorPaymentRemote): UpdatePaymentErrorStatusUseCase {
         return UpdatePaymentErrorStatusUseCase(errorPaymentRemote)
     }

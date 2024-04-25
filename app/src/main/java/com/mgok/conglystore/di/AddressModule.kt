@@ -12,16 +12,16 @@ import com.mgok.conglystore.usecases.address.UpsertAddressUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object AddressModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesAddressRemoteRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -31,30 +31,30 @@ object AddressModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListAddressUseCase(addressRemoteRepository: AddressRemoteRepository): GetListAddressUseCase {
         return GetListAddressUseCase(addressRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetAddressUseCase(addressRemoteRepository: AddressRemoteRepository): GetAddressUseCase {
         return GetAddressUseCase(addressRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpsertAddressUseCase(addressRemoteRepository: AddressRemoteRepository): UpsertAddressUseCase {
         return UpsertAddressUseCase(addressRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteAddressUseCase(addressRemoteRepository: AddressRemoteRepository): DeleteAddressUseCase {
         return DeleteAddressUseCase(addressRemoteRepository)
     }
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetFistAddressUseCase(addressRemoteRepository: AddressRemoteRepository): GetFistAddressUseCase {
         return GetFistAddressUseCase(addressRemoteRepository)
     }

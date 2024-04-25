@@ -22,14 +22,14 @@ import com.mgok.conglystore.usecases.user.UserSignOutUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object UserModule {
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUserRemoteRepository(
         auth: FirebaseAuth,
         firestore: FirebaseFirestore,
@@ -41,37 +41,37 @@ object UserModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetInfoUserUseCase(userRemoteRepository: UserRemoteRepository): GetInfoUserUseCase {
         return GetInfoUserUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUserSignOutUseCase(userRemoteRepository: UserRemoteRepository): UserSignOutUseCase {
         return UserSignOutUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetFireBaseUserUseCase(auth: FirebaseAuth): GetFireBaseUserUseCase {
         return GetFireBaseUserUseCase(auth)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesSignInResultUseCase(userRemoteRepository: UserRemoteRepository): SignInResultUseCase {
         return SignInResultUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesLoginWithAccountUseCase(userRemoteRepository: UserRemoteRepository): LoginWithAccountUseCase {
         return LoginWithAccountUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGoogleAuthUiClientSignInUseCase(userRemoteRepository: UserRemoteRepository): GoogleAuthUiClientSignInUseCase {
         return GoogleAuthUiClientSignInUseCase(userRemoteRepository)
     }
@@ -79,44 +79,44 @@ object UserModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesHandleFacebookAccessTokenUseCase(userRemoteRepository: UserRemoteRepository): HandleFacebookAccessTokenUseCase {
         return HandleFacebookAccessTokenUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCreateAccountUseCase(userRemoteRepository: UserRemoteRepository): CreateAccountUseCase {
         return CreateAccountUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesResetPasswordUseCase(userRemoteRepository: UserRemoteRepository): ResetPasswordUseCase {
         return ResetPasswordUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateAvatarWithLinkUserCase(userRemoteRepository: UserRemoteRepository): UpdateAvatarWithLinkUserCase {
         return UpdateAvatarWithLinkUserCase(userRemoteRepository)
     }
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateAvatar(userRemoteRepository: UserRemoteRepository): UpdateAvatarUseCase {
         return UpdateAvatarUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteAvatarUseCase(userRemoteRepository: UserRemoteRepository): DeleteAvatarUseCase {
         return DeleteAvatarUseCase(userRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateInfoUserUseCase(userRemoteRepository: UserRemoteRepository): UpdateInfoUserUseCase {
         return UpdateInfoUserUseCase(userRemoteRepository)
     }
