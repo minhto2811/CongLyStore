@@ -10,15 +10,15 @@ import com.mgok.conglystore.usecases.favorite.GetListFavoriteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object FavoriteModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesFavoriteRemoteRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -28,19 +28,19 @@ object FavoriteModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListFavoriteUseCase(favoriteRemoteRepository: FavoriteRemoteRepository): GetListFavoriteUseCase {
         return GetListFavoriteUseCase(favoriteRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesAddFavoriteUseCase(favoriteRemoteRepository: FavoriteRemoteRepository): AddFavoriteUseCase {
         return AddFavoriteUseCase(favoriteRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeteleFavoriteUseCase(favoriteRemoteRepository: FavoriteRemoteRepository): DeteleFavoriteUseCase {
         return DeteleFavoriteUseCase(favoriteRemoteRepository)
     }

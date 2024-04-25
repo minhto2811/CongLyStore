@@ -17,14 +17,14 @@ import com.mgok.conglystore.usecases.image.UploadImageUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object CoffeeModule {
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCoffeeRemoteRepository(
         firestore: FirebaseFirestore,
         storage: FirebaseStorage
@@ -34,61 +34,61 @@ object CoffeeModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetCoffeeByIdUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): GetCoffeeByIdUseCase {
         return GetCoffeeByIdUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListCoffeeByName(coffeeRemoteRepository: CoffeeRemoteRepository): GetListCoffeeByNameUseCase {
         return GetListCoffeeByNameUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListCoffeeUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): GetListCoffeeUseCase {
         return GetListCoffeeUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUploadImageUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): UploadImageUseCase {
         return UploadImageUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesInsertCoffeeUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): InsertCoffeeUseCase {
         return InsertCoffeeUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteImageUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): DeleteImageUseCase {
         return DeleteImageUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateSoldProductUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): UpdateSoldProductUseCase {
         return UpdateSoldProductUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListCoffeeBySold(coffeeRemoteRepository: CoffeeRemoteRepository): GetListCoffeeBySold {
         return GetListCoffeeBySold(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesFilterCoffeebyQuerryUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): FilterCoffeebyQuerryUseCase {
         return FilterCoffeebyQuerryUseCase(coffeeRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteCoffeeByIdUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): DeleteCoffeeByIdUseCase {
         return DeleteCoffeeByIdUseCase(coffeeRemoteRepository)
     }

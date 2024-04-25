@@ -15,15 +15,15 @@ import com.mgok.conglystore.usecases.bill.UpdateStatusBillUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object BillModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesBillRemoteREpository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -32,48 +32,48 @@ object BillModule {
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListBillByUserUseCase(billRemoteRepository: BillRemoteRepository): GetListBillByUserUseCase {
         return GetListBillByUserUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListBillUseCase(billRemoteRepository: BillRemoteRepository): GetListBillUseCase {
         return GetListBillUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetBillByIdUseCase(billRemoteRepository: BillRemoteRepository): GetBillByIdUseCase {
         return GetBillByIdUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdatePaymentStatusUseCase(billRemoteRepository: BillRemoteRepository): UpdatePaymentStatusUseCase {
         return UpdatePaymentStatusUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateStatusBillUseCase(billRemoteRepository: BillRemoteRepository): UpdateStatusBillUseCase {
         return UpdateStatusBillUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesDeleteBillUseCase(billRemoteRepository: BillRemoteRepository): DeleteBillUseCase {
         return DeleteBillUseCase(billRemoteRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCreateBillUseCase(billRemoteRepository: BillRemoteRepository): CreateBillUseCase {
         return CreateBillUseCase(billRemoteRepository)
     }
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListBillByDateUseCase(billRemoteRepository: BillRemoteRepository): GetListBillByDateUseCase {
         return GetListBillByDateUseCase(billRemoteRepository)
     }

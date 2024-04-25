@@ -11,15 +11,15 @@ import com.mgok.conglystore.usecases.refund.UpdateRefundStatusUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object RefundModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesRefundRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
@@ -28,25 +28,25 @@ object RefundModule {
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesCreateRefundUseCase(refundRepository: RefundRepository): CreateRefundUseCase {
         return CreateRefundUseCase(refundRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListRefundUseCase(refundRepository: RefundRepository): GetListRefundUseCase {
         return GetListRefundUseCase(refundRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesGetListRefundByUserUseCase(refundRepository: RefundRepository): GetListRefundByUserUseCase {
         return GetListRefundByUserUseCase(refundRepository)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providesUpdateRefundStatusUseCase(refundRepository: RefundRepository): UpdateRefundStatusUseCase {
         return UpdateRefundStatusUseCase(refundRepository)
     }
