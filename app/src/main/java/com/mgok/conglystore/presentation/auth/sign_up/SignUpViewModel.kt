@@ -25,7 +25,7 @@ class SignUpViewModel @Inject constructor(
     private val createAccountUseCase: CreateAccountUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(SignUpState())
-    val state = _state.asStateFlow()
+    val state get() = _state.asStateFlow()
 
 
     val email = mutableStateOf("")

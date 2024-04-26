@@ -28,7 +28,7 @@ class DetailCoffeeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(DetailCoffeeStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
     fun getCoffeeById(coffeeId: String) {
         viewModelScope.launch(Dispatchers.IO) {

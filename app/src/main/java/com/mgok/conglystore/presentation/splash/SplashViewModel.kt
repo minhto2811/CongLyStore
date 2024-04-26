@@ -20,7 +20,7 @@ class SplashViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _route = MutableStateFlow<String?>(null)
-    val route = _route.asStateFlow()
+    val route get()= _route.asStateFlow()
 
 
      fun checkOut() {

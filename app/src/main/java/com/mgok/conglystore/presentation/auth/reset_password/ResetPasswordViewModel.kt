@@ -21,7 +21,7 @@ class ResetPasswordViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(ResetPasswordState())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
     val email = mutableStateOf("")
 

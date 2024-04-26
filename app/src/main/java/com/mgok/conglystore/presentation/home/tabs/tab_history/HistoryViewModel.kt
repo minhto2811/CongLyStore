@@ -16,7 +16,7 @@ class HistoryViewModel @Inject constructor(
     private val getListBillByUserUseCase: GetListBillByUserUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(HistoryStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
     fun getListBill() {
         viewModelScope.launch(Dispatchers.IO) {

@@ -40,7 +40,7 @@ class SignInViewModel @Inject constructor(
 
 
     private val _state = MutableStateFlow(SignInState())
-    val state = _state.asStateFlow()
+    val state get() = _state.asStateFlow()
 
     val email = mutableStateOf("")
     val password = mutableStateOf("")

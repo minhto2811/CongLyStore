@@ -23,7 +23,7 @@ class RefundViewModel @Inject constructor(
     private val getInfoUserUseCase: GetInfoUserUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(RefundStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
     var status by mutableIntStateOf(-1)
 
 

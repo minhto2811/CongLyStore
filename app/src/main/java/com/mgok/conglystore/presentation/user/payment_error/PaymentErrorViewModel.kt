@@ -23,7 +23,7 @@ class PaymentErrorViewModel @Inject constructor(
     private val getListErrorPaymentUseCase: GetListErrorPaymentUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(PMStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
     var status by mutableIntStateOf(-1)
 
 

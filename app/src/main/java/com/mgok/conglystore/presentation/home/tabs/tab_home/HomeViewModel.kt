@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
     private val getLocationByLatlngUseCase: GetLocationByLatlngUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(HomeStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
 
     var chipState = mutableIntStateOf(0)
