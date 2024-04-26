@@ -38,7 +38,7 @@ class NewCoffeeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(NewCoffeeStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
 
     var nameCoffee = mutableStateOf("")

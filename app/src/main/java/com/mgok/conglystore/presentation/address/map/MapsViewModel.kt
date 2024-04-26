@@ -26,7 +26,7 @@ class MapsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(MapStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
     var searchText by mutableStateOf("")
     val visibleDialog = mutableStateOf(false)

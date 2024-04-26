@@ -18,7 +18,7 @@ class SettingsViewModel @Inject constructor(
     private val getInfoUserUseCase: GetInfoUserUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(SettingsStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
     init {
         getInfoUser()

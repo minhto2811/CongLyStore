@@ -34,7 +34,7 @@ class BillViewModel @Inject constructor(
     private val updateSoldProductUseCase: UpdateSoldProductUseCase
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(BillStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
 
     fun updateStatusBill(billId: String, status: Int) {

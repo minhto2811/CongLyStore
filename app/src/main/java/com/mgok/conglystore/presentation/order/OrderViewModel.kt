@@ -32,7 +32,7 @@ class OrderViewModel @Inject constructor(
 
 
     private val _stateUI = MutableStateFlow(OrderStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
 
     fun createBill(billId: String, price: Long, paymentStatus: Int = -1) {

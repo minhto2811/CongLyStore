@@ -27,7 +27,7 @@ class NewAddressvViewModel @Inject constructor(
 
     private val _stateUI = MutableStateFlow(NewAddressStateUI())
 
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
 
     val displayName = mutableStateOf("")

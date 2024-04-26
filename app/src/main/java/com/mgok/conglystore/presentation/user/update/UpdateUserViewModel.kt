@@ -42,7 +42,7 @@ class UpdateUserViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(UpdateInfoUserState())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
 
     val displayName = mutableStateOf(removeNonAlphanumericVN(auth.currentUser?.displayName ?: ""))

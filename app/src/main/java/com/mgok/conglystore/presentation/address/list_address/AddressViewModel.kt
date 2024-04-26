@@ -22,7 +22,7 @@ class AddressViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(AddressStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
     var addressIdDel by mutableStateOf<String?>(null)
     fun getListAddress() {

@@ -25,7 +25,7 @@ class CoffeeTypeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(CoffeeTypeStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get() = _stateUI.asStateFlow()
 
     val name = mutableStateOf("")
 

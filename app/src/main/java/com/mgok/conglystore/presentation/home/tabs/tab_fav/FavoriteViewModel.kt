@@ -24,7 +24,7 @@ class FavoriteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(FavoriteStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
      fun getFavorite() {
         viewModelScope.launch(Dispatchers.IO) {

@@ -25,7 +25,7 @@ class CartViewModel @Inject constructor(
     private val deleteCartByIdUseCase: DeleteCartByIdUseCase,
 ) : ViewModel() {
     private val _stateUI = MutableStateFlow(CartStateUI())
-    val stateUI = _stateUI.asStateFlow()
+    val stateUI get()= _stateUI.asStateFlow()
 
     fun getListCart() {
         viewModelScope.launch(Dispatchers.IO) {
