@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mgok.conglystore.data.remote.coffee_type.CoffeeType
+import com.mgok.conglystore.usecases.coffee.DeleteCoffeeByTypeUseCase
 import com.mgok.conglystore.usecases.coffee_type.DeleteCoffeeTypeUseCase
 import com.mgok.conglystore.usecases.coffee_type.GetListCoffeeTypeUseCase
 import com.mgok.conglystore.usecases.coffee_type.InsertCoffeeTypeUseCase
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class CoffeeTypeViewModel @Inject constructor(
     private val insertCoffeeTypeUseCase: InsertCoffeeTypeUseCase,
     private val deleteCoffeeTypeUseCase: DeleteCoffeeTypeUseCase,
-    private val getListCoffeeTypeUseCase: GetListCoffeeTypeUseCase
+    private val getListCoffeeTypeUseCase: GetListCoffeeTypeUseCase,
+    private val deleteCoffeeByTypeUseCase: DeleteCoffeeByTypeUseCase
 ) : ViewModel() {
 
     private val _stateUI = MutableStateFlow(CoffeeTypeStateUI())
@@ -77,6 +79,7 @@ class CoffeeTypeViewModel @Inject constructor(
                 val list = _stateUI.value.listCoffeeType.toMutableList()
                 list.remove(coffeeType)
                 _stateUI.update { it.copy(listCoffeeType = list) }
+                deleteCoffeeByTypeUseCase.invoke(coffeeType.name)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

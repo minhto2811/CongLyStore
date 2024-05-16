@@ -12,6 +12,7 @@ import com.mgok.conglystore.usecases.coffee.GetListCoffeeBySold
 import com.mgok.conglystore.usecases.coffee.GetListCoffeeUseCase
 import com.mgok.conglystore.usecases.coffee.InsertCoffeeUseCase
 import com.mgok.conglystore.usecases.coffee.UpdateSoldProductUseCase
+import com.mgok.conglystore.usecases.coffee_type.DeleteCoffeeTypeUseCase
 import com.mgok.conglystore.usecases.image.DeleteImageUseCase
 import com.mgok.conglystore.usecases.image.UploadImageUseCase
 import dagger.Module
@@ -92,4 +93,11 @@ object CoffeeModule {
     fun providesDeleteCoffeeByIdUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): DeleteCoffeeByIdUseCase {
         return DeleteCoffeeByIdUseCase(coffeeRemoteRepository)
     }
+
+    @Provides
+    @ViewModelScoped
+    fun providesDeleteCoffeeTypeUseCase(coffeeRemoteRepository: CoffeeRemoteRepository): DeleteCoffeeTypeUseCase {
+        return DeleteCoffeeTypeUseCase(coffeeRemoteRepository)
+    }
+
 }
