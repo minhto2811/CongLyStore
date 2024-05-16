@@ -60,6 +60,14 @@ class CoffeeRemoteRepositoryImpl @Inject constructor(
         firestore.collection("coffees").document(idCoffee).update("delete", true).await()
     }
 
+    override suspend fun deleteCoffeeByType(type: String) {
+        firestore.collection("coffees").whereEqualTo("type", type).get().addOnCompleteListener {
+            for (document in it.result!!) {
+                firestore.collection("coffees").document(document.id).update("delete", true)
+            }
+        }
+    }
+
     override suspend fun getListCoffee(): List<Coffee> {
         val snapshot = firestore.collection("coffees").whereEqualTo("delete", false).get().await()
         return snapshot.toObjects(Coffee::class.java)

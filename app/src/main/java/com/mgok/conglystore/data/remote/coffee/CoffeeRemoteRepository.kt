@@ -19,4 +19,6 @@ interface CoffeeRemoteRepository {
     suspend fun filterCoffeeByQuery(querry: String): List<Coffee>
 
     suspend fun deleteCoffee(idCoffee: String)
+
+    suspend fun deleteCoffeeByType(type: String)
 }
