@@ -1,10 +1,10 @@
 package com.mgok.conglystore.usecases.coffee_type
 
-import com.mgok.conglystore.data.remote.coffee.CoffeeRemoteRepository
+import com.mgok.conglystore.data.remote.coffee_type.CoffeeTypeRemoteRepository
 import javax.inject.Inject
 
 class DeleteCoffeeTypeUseCase @Inject constructor(
-    private val coffeeRemoteRepository: CoffeeRemoteRepository
+    private val coffeeTypeRemoteRepository: CoffeeTypeRemoteRepository
 ) {
-    suspend fun delete(coffeeType: String) =  coffeeRemoteRepository.deleteCoffeeByType(coffeeType)
+    suspend fun delete(coffeeType: String) =  coffeeTypeRemoteRepository.deleteCoffeeType(coffeeType)
 }
