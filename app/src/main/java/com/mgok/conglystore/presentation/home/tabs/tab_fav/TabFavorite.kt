@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.mgok.conglystore.MainActivity
 import com.mgok.conglystore.R
 import com.mgok.conglystore.component.BackgroundDelete
 import com.mgok.conglystore.component.LotifiesCompose
@@ -88,7 +89,7 @@ fun TabFavorite(
                         favoriteViewModel.deleteFavorite(coffee.id)
                     },
                     gotoDetail = {
-                        changePage.invoke("detail_coffee/${coffee.id}")
+                        changePage.invoke("${MainActivity.Route.route_detail_coffee}/coffeeId=${coffee.id}")
                     })
                 VerticalDivider(
                     modifier = Modifier
